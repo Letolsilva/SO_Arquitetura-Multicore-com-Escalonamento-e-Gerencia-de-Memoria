@@ -1,0 +1,1 @@
+# Trab-SO_Arquitetura-Multicore
