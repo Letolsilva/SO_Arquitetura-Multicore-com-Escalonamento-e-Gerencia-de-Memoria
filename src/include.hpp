@@ -11,9 +11,10 @@
 #include <filesystem>
 #include <pthread.h>
 #include <mutex>
-#include <condition_variable>
+#include <semaphore.h>
 
 #define NUM_PERIFERICOS 5
+#define NUM_CORE 2
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -24,6 +25,8 @@ extern int CLOCK;
 extern unordered_map<int, int> cache;
 extern vector<int> principal;
 extern vector<vector<int>> disco;
+extern vector<mutex> mutexCores;
+extern sem_t semaforoCores; // Semáforo para limitar threads simultâneas
 
 extern bool perifericos[NUM_PERIFERICOS];
 
@@ -45,6 +48,5 @@ struct PCB {
 // Declarações de variáveis globais
 extern vector<PCB> processos;
 extern std::mutex mutexProcessos;
-extern pthread_cond_t semaforo;
 
 #endif

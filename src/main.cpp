@@ -28,6 +28,8 @@ int PC = 0;
 int CLOCK = 0;
 bool perifericos[NUM_PERIFERICOS] = {false};
 vector<int> principal;
+sem_t semaforoCores; // Definição do semáforo
+vector<mutex> mutexCores(NUM_CORE);
 
 int main()
 {
@@ -52,22 +54,25 @@ int main()
 
     vector<pthread_t> threads(processos.size());
     vector<int> ids(processos.size());
-    pthread_cond_init(&semaforo, nullptr);
 
-    for (size_t i = 0; i < processos.size(); ++i) {
+    // Inicializar o semáforo com valor 3 (3 cores disponíveis)
+    sem_init(&semaforoCores, 0, NUM_CORE);
+
+    // Criar threads para processar os processos
+    for (size_t i = 0; i < processos.size(); ++i)
+    {
         ids[i] = i; // Armazena o ID para passar como argumento
         pthread_create(&threads[i], nullptr, processarProcesso, &ids[i]);
     }
 
     // Aguardar todas as threads terminarem
-    for (size_t i = 0; i < threads.size(); ++i) {
-        pthread_join(threads[i], nullptr);
+    for (auto &thread : threads)
+    {
+        pthread_join(thread, nullptr);
     }
 
-    pthread_cond_destroy(&semaforo);
-
-
-
+    // Destruir o semáforo
+    sem_destroy(&semaforoCores);
 
     return 0;
 }
