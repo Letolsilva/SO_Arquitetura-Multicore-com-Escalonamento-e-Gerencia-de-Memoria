@@ -1,9 +1,11 @@
 #include "unidadeControle.hpp"
+#include "memoria.hpp"
 #include "functions.hpp"
 
 // Definir as variáveis globais
-vector<PCB> processos;       // Vetor compartilhado de processos
-std::mutex mutexProcessos;   // Mutex para controle de acesso ao vetor
+vector<PCB> memoria;
+vector<Page> memoryPages; //Nossa memoria
+mutex mutexProcessos;   // Mutex para controle de acesso ao vetor
 
 // Função para inicializar um processo com quantum e timestamp
 Processo criarProcesso(int quantumInicial, int idProcesso)
@@ -29,7 +31,6 @@ void LerInstrucoesDoArquivo(const string &nomeArquivo, int *registradores){
 
     while (getline(arquivo, linha))
     {
-        // stringstream ss(linha);
         UnidadeControle(registradores, linha);
         cout << "Clock: " << CLOCK << endl;
     }
@@ -37,48 +38,20 @@ void LerInstrucoesDoArquivo(const string &nomeArquivo, int *registradores){
     arquivo.close();
 }
 
-void carregarProcessos(const string &diretorio, vector<PCB> &processos)
-{
-    int idAtual = 1; // ID inicial para os processos
-
-    for (const auto &entry : fs::directory_iterator(diretorio))
-    {
-        if (entry.path().extension() == ".data")
-        {
-            PCB pcb;
-            pcb.id = idAtual++;
-            pcb.nomeArquivo = entry.path().string();
-            pcb.quantum = 10;
-            pcb.timestamp = CLOCK;
-
-            ifstream arquivo(pcb.nomeArquivo);
-            string linha;
-            while (getline(arquivo, linha))
-            {
-                pcb.instrucoes.push_back(linha);
-            }
-            arquivo.close();
-
-            processos.push_back(pcb);
-        }
-    }
-}
-
-void *processarProcesso(void *arg)
-{
-    int idProcesso = *static_cast<int *>(arg);
+void *processarProcesso(void *arg){
+    int idMemoria = *static_cast<int *>(arg);
 
     PCB processo;
     {
-        std::lock_guard<std::mutex> lock(mutexProcessos);
-        processo = processos[idProcesso];
+        lock_guard<mutex> lock(mutexProcessos);
+        processo = memoria[idMemoria];
     }
 
     sem_wait(&semaforoCores);
 
-    int coreId = idProcesso % NUM_CORE; // Distribui os processos para os núcleos
+    int coreId = idMemoria % NUM_CORE; // Distribui os processos para os núcleos
     {
-        std::lock_guard<std::mutex> lock(mutexCores[coreId]);
+        lock_guard<mutex> lock(mutexCores[coreId]);
 
         cout << "Thread processando: ID=" << processo.id
              << " no Core=" << coreId
@@ -96,3 +69,6 @@ void *processarProcesso(void *arg)
     sem_post(&semaforoCores);
     pthread_exit(nullptr);
 }
+
+// colocar vetor para simbolizar a ordem de quem ja foi usado , michel deu o nome de SO
+//pipeline é uma barreira

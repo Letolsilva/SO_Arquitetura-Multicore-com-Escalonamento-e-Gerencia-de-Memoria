@@ -17,7 +17,7 @@
 #define NUM_CORE 2
 
 using namespace std;
-namespace fs = std::filesystem;
+namespace fs = filesystem;
 
 extern int PC;
 extern int CLOCK;
@@ -26,7 +26,7 @@ extern unordered_map<int, int> cache;
 extern vector<int> principal;
 extern vector<vector<int>> disco;
 extern vector<mutex> mutexCores;
-extern sem_t semaforoCores; // Semáforo para limitar threads simultâneas
+extern sem_t semaforoCores;
 
 extern bool perifericos[NUM_PERIFERICOS];
 
@@ -34,7 +34,7 @@ extern bool perifericos[NUM_PERIFERICOS];
 struct Processo {
     int quantum;
     int timestamp;
-    int id; // Identificador do processo (se necessário)
+    int id;     // Identificador do processo (se necessário)
 };
 
 struct PCB {
@@ -45,8 +45,19 @@ struct PCB {
     vector<string> instrucoes;  // Instruções do processo
 };
 
-// Declarações de variáveis globais
-extern vector<PCB> processos;
-extern std::mutex mutexProcessos;
+struct Page {
+    int base;           // Endereço base
+    int limit;          // Limite de memória
+    PCB pcb;            // Controle do processo
+    pthread_t thread;   // Thread associada ao processo
+};
+
+extern vector<Page> memoryPages;    // Lista de páginas de memória
+extern vector<int> listaCircular_SO;
+extern int currentPageIndex;  
+extern vector<PCB> memoria;
+extern mutex mutexProcessos;
+
+
 
 #endif
