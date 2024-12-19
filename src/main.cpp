@@ -33,7 +33,8 @@ int main()
         // Criar threads para CPU (multicore)
         for (int i = 0; i < NUM_CORE; ++i)
         {
-            int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, nullptr);
+            int *coreIndex = new int(i);
+            int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, coreIndex);
             if (status_cpu != 0)
             {
                 cerr << "Erro ao criar a thread da CPU!" << endl;
