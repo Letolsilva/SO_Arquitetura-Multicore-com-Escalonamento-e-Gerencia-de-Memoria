@@ -1,6 +1,7 @@
 #include "functions.hpp"
 #include "memoria.hpp"
 #include "include.hpp"
+#include "SO.hpp"
 
 int PC = 0;
 int CLOCK = 0;
@@ -9,49 +10,28 @@ bool perifericos[NUM_PERIFERICOS] = {false};
 vector<int> principal;
 sem_t semaforoCores; // Definição do semáforo
 vector<mutex> mutexCores(NUM_CORE);
+vector<int> processosNaMemoria;
 
-int main(){
-
+int main()
+{
     // Bootloader ------------------------------------ //
-    //pthread_t thread_cpu = {};
+    // pthread_t thread_cpu = {};
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     // ------------------------------------------------ //
 
-    int status_memoria = povoando_Memoria(thread_memoria,diretorio);
-    int status_so = iniciando_SO(thread_so);
-
-
+    int status_memoria = povoando_Memoria(thread_memoria, diretorio);
     pthread_join(thread_memoria, nullptr);
-    
-    if(status_memoria == 0 && status_so == 0){
+
+    // Inicializa o SO com os processos carregados
+    int status_so = iniciando_SO(thread_so, processosNaMemoria);
+
+    if (status_memoria == 0 && status_so == 0)
+    {
         printProcessos();
-        imprimirListaCircular_SO();
+        imprimirListaCircular_SO(); // Confirmação dos processos carregados no SO
     }
 
-    /*
-    vector<pthread_t> threads(memoria.size());
-    vector<int> ids(memoria.size());
-
-    // Inicializar o semáforo com valor 3 (3 cores disponíveis)
-    sem_init(&semaforoCores, 0, NUM_CORE);
-
-    // Criar threads para processar os processos
-    for (size_t i = 0; i < memoria.size(); ++i)
-    {
-        ids[i] = i; // Armazena o ID para passar como argumento
-        pthread_create(&threads[i], nullptr, processarProcesso, &ids[i]);
-    }
-
-    // Aguardar todas as threads terminarem
-    for (auto &thread : threads)
-    {
-        pthread_join(thread, nullptr);
-    }
-
-    // Destruir o semáforo
-    sem_destroy(&semaforoCores);
-    */
-
+    pthread_join(thread_so, nullptr); // Aguardar o término da thread do SO
     return 0;
 }
