@@ -18,27 +18,6 @@ Processo criarProcesso(int quantumInicial, int idProcesso)
     return p;
 }
 
-void LerInstrucoesDoArquivo(const string &nomeArquivo, int *registradores)
-{
-
-    // string nomeArquivo = "input.data";
-    ifstream arquivo(nomeArquivo);
-    string linha;
-
-    if (!arquivo.is_open())
-    {
-        cout << "Erro ao abrir o arquivo!" << endl;
-        return;
-    }
-
-    while (getline(arquivo, linha))
-    {
-        UnidadeControle(registradores, linha);
-        cout << "Clock: " << CLOCK << endl;
-    }
-
-    arquivo.close();
-}
 void *processarProcesso(void *arg)
 {
     (void)arg;
@@ -82,13 +61,19 @@ void *processarProcesso(void *arg)
         cout << "Processando processo ID=" << idProcesso << endl;
 
         PCB processoAtual = paginaAtual.pcb;
-
-        for (const auto &instrucao : processoAtual.instrucoes)
-        {
-            UnidadeControle(registradores, instrucao);
+        int quantumInicial = processoAtual.quantum;
+       
+        for (const auto &instrucao : processoAtual.instrucoes) {
+            try {
+                UnidadeControle(registradores, instrucao, processoAtual.quantum);               
+            } catch (const runtime_error &e) {
+                cout << "Quantum esgotado para o processo ID=" << idProcesso << ". Interrompendo execução." << endl;
+                break;
+            }
         }
-
-        cout << "Processo ID=" << idProcesso << " finalizado." << endl;
+        cout << "Final da Pipeline: Quantum = " << processoAtual.quantum << endl;
+        processoAtual.timestamp += (quantumInicial - processoAtual.quantum); 
+        cout << " timestamp do processo: " <<processoAtual.timestamp << endl;
         usleep(1000); // Simular tempo de execução do processo
 
         // Verifica se a memória está vazia
@@ -105,4 +90,4 @@ void *processarProcesso(void *arg)
 // colocar vetor para simbolizar a ordem de quem ja foi usado , michel deu o nome de SO
 // pipeline é uma barreira
 
-// gerar um output, quatum e multicore
+// gerar um output, timestamp 

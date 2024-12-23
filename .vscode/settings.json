@@ -3,6 +3,9 @@
     "iostream": "cpp",
     "ostream": "cpp",
     "chrono": "cpp",
-    "new": "cpp"
+    "new": "cpp",
+    "stdexcept": "cpp",
+    "iosfwd": "cpp",
+    "algorithm": "cpp"
   }
 }

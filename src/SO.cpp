@@ -17,8 +17,7 @@ void atualizarListaCircular(int idProcesso)
 void *fazerListaCircular_SO(void *arg)
 {
     vector<int> *processos = static_cast<vector<int> *>(arg);
-    for (int id : *processos)
-    {
+    for (int id : *processos){
         atualizarListaCircular(id);
     }
     return nullptr;

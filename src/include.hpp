@@ -12,6 +12,8 @@
 #include <pthread.h>
 #include <mutex>
 #include <semaphore.h>
+#include <random> 
+#include <algorithm>
 
 #define NUM_PERIFERICOS 5
 #define NUM_CORE 2
@@ -42,6 +44,7 @@ struct PCB
     int id;                    // ID do processo
     int quantum;               // Quantum inicial
     int timestamp;             // Timestamp inicial
+    int tempoEspera; 
     string nomeArquivo;        // Nome do arquivo associado
     vector<string> instrucoes; // Instruções do processo
 };

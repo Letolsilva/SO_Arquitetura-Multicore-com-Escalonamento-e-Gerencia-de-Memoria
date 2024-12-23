@@ -5,6 +5,10 @@ void carregarProcessosNaMemoria(const string &diretorio)
 {
     int idAtual = 1;
 
+    random_device rd; // Gerador baseado em hardware
+    mt19937 gen(rd()); // Mersenne Twister para gerar números pseudoaleatórios
+    uniform_int_distribution<> dist(20, 50); // Define o intervalo [20, 50]
+
     for (const auto &entry : fs::directory_iterator(diretorio))
     {
         if (entry.path().extension() == ".data")
@@ -12,7 +16,7 @@ void carregarProcessosNaMemoria(const string &diretorio)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
-            pcb.quantum = 10;
+            pcb.quantum = dist(gen);
             pcb.timestamp = CLOCK;
 
             ifstream arquivo(pcb.nomeArquivo);
@@ -59,21 +63,17 @@ int povoando_Memoria(pthread_t &thread_memoria, string diretorio)
     return 0;
 }
 
-void printProcessos()
-{
-
-    // Exibir informações dos processos carregados
-    for (const auto &page : memoryPages)
-    {
+void printProcessos() {
+    for (const auto &page : memoryPages) {
         const PCB &pcb = page.pcb;
         cout << "Processo ID: " << pcb.id << endl;
         cout << "Arquivo: " << pcb.nomeArquivo << endl;
         cout << "Quantum: " << pcb.quantum << endl;
-        cout << "Timestamp: " << pcb.timestamp << endl;
+        cout << "Timestamp (execução + espera): " << pcb.timestamp << endl;
+        cout << "Tempo de espera acumulado: " << pcb.tempoEspera << endl;
         cout << "Instruções: " << endl;
 
-        for (const string &instrucao : pcb.instrucoes)
-        {
+        for (const string &instrucao : pcb.instrucoes) {
             cout << "  " << instrucao << endl;
         }
         cout << "-----------------------------" << endl;
