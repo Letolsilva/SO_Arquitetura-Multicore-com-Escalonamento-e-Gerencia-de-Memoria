@@ -1,12 +1,13 @@
 #include "memoria.hpp"
 #include "SO.hpp"
+#include "functions.hpp"
 
 void carregarProcessosNaMemoria(const string &diretorio)
 {
     int idAtual = 1;
 
-    random_device rd; // Gerador baseado em hardware
-    mt19937 gen(rd()); // Mersenne Twister para gerar números pseudoaleatórios
+    random_device rd;                        // Gerador baseado em hardware
+    mt19937 gen(rd());                       // Mersenne Twister para gerar números pseudoaleatórios
     uniform_int_distribution<> dist(20, 50); // Define o intervalo [20, 50]
 
     for (const auto &entry : fs::directory_iterator(diretorio))
@@ -33,7 +34,7 @@ void carregarProcessosNaMemoria(const string &diretorio)
             nova_pagina_memoria.pcb = pcb;
 
             memoryPages.push_back(nova_pagina_memoria);
-            
+
             atualizarListaCircular(pcb.id);
         }
     }
@@ -41,7 +42,7 @@ void carregarProcessosNaMemoria(const string &diretorio)
 
 void *threadCarregarProcessos(void *arg)
 {
-    string diretorio = *static_cast<string *>(arg); // Recupera o argumento passado para a thread
+    string diretorio = *static_cast<string *>(arg);
     carregarProcessosNaMemoria(diretorio);
     return nullptr;
 }
@@ -61,21 +62,4 @@ int povoando_Memoria(pthread_t &thread_memoria, string diretorio)
     // A thread principal aguarda a thread de carregamento terminar
     // pthread_join(thread_memoria, nullptr);
     return 0;
-}
-
-void printProcessos() {
-    for (const auto &page : memoryPages) {
-        const PCB &pcb = page.pcb;
-        cout << "Processo ID: " << pcb.id << endl;
-        cout << "Arquivo: " << pcb.nomeArquivo << endl;
-        cout << "Quantum: " << pcb.quantum << endl;
-        cout << "Timestamp (execução + espera): " << pcb.timestamp << endl;
-        cout << "Tempo de espera acumulado: " << pcb.tempoEspera << endl;
-        cout << "Instruções: " << endl;
-
-        for (const string &instrucao : pcb.instrucoes) {
-            cout << "  " << instrucao << endl;
-        }
-        cout << "-----------------------------" << endl;
-    }
 }

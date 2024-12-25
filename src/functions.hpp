@@ -2,9 +2,9 @@
 #define FUNCTIONS_HPP
 #include "include.hpp"
 
-void LerInstrucoesDoArquivo(const string &nomeArquivo, int *registradores);
 Processo criarProcesso(int quantumInicial, int idProcesso);
 void *processarProcesso(void *arg);
-void printProcessos();
+void salvarNoArquivo(const string &conteudo);
+void atualizarStatusCores();
 
 #endif

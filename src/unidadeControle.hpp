@@ -3,7 +3,6 @@
 
 #include "include.hpp"
 
-void UnidadeControle(int *registradores, string linha, int &quantum);
-//void InstructionFetch(int *registradores, string linha);
+void UnidadeControle(int *registradores, string linha, int &quantum, PCB &processoAtual);
 
 #endif

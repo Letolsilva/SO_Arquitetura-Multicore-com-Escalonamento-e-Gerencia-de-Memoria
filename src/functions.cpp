@@ -21,11 +21,10 @@ Processo criarProcesso(int quantumInicial, int idProcesso)
 void *processarProcesso(void *arg)
 {
     (void)arg;
-    int *registradores = new int[8](); // Registradores do processo
+    int *registradores = new int[8]();
 
     while (true)
     {
-        // Obter o próximo processo da lista circular
         int idProcesso = obterProximoProcesso();
         if (idProcesso == -1)
         {
@@ -53,41 +52,66 @@ void *processarProcesso(void *arg)
 
         if (!encontrou)
         {
-            cout << "Processo ID=" << idProcesso << " não encontrado na memória." << endl;
             continue;
         }
 
-        // Processar as instruções do processo
-        cout << "Processando processo ID=" << idProcesso << endl;
-
         PCB processoAtual = paginaAtual.pcb;
         int quantumInicial = processoAtual.quantum;
-       
-        for (const auto &instrucao : processoAtual.instrucoes) {
-            try {
-                UnidadeControle(registradores, instrucao, processoAtual.quantum);               
-            } catch (const runtime_error &e) {
+        cout << "Processando processo ID=" << idProcesso << endl;
+        stringstream ss;
+        ss << "=== Processo ID: " << idProcesso << " ===" << endl;
+        ss << "Quantum Inicial: " << quantumInicial << endl;
+        ss << "Timestamp Inicial: " << processoAtual.timestamp << endl;
+        ss << "Instruções:" << endl;
+
+        for (const auto &instrucao : processoAtual.instrucoes)
+        {
+            ss << "  - " << instrucao << endl;
+        }
+
+        for (const auto &instrucao : processoAtual.instrucoes)
+        {
+            try
+            {
+                // Processar instrução e capturar resultado
+                UnidadeControle(registradores, instrucao, processoAtual.quantum, processoAtual);
+            }
+            catch (const runtime_error &e)
+            {
                 cout << "Quantum esgotado para o processo ID=" << idProcesso << ". Interrompendo execução." << endl;
                 break;
             }
         }
-        cout << "Final da Pipeline: Quantum = " << processoAtual.quantum << endl;
-        processoAtual.timestamp += (quantumInicial - processoAtual.quantum); 
-        cout << " timestamp do processo: " <<processoAtual.timestamp << endl;
-        usleep(1000); // Simular tempo de execução do processo
+
+        ss << "Resultado: " << processoAtual.resultado << endl;
+        ss << "Quantum Final: " << processoAtual.quantum << endl;
+        processoAtual.timestamp += (quantumInicial - processoAtual.quantum);
+        ss << "Timestamp Final: " << processoAtual.timestamp << endl;
+        ss << "=============================" << endl;
+        cout << ss.str();
+        salvarNoArquivo(ss.str());
 
         // Verifica se a memória está vazia
         if (memoryPages.empty())
         {
-            cout << "Todos os processos foram executados. Encerrando o programa." << endl;
-            break; // Sai do loop, encerrando a execução do processo
+            break;
         }
     }
 
     delete[] registradores;
     pthread_exit(nullptr);
 }
-// colocar vetor para simbolizar a ordem de quem ja foi usado , michel deu o nome de SO
-// pipeline é uma barreira
 
-// gerar um output, timestamp 
+void salvarNoArquivo(const string &conteudo)
+{
+    ofstream arquivo("output.data", ios::app);
+    if (arquivo.is_open())
+    {
+        arquivo << conteudo << endl;
+        arquivo.close();
+    }
+    else
+    {
+        cerr << "Erro ao abrir o arquivo output.data!" << endl;
+    }
+}
