@@ -35,6 +35,7 @@ release: all
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
+	-@rm -f output/output.data
 
 run:
 	./$(BUILD)/$(TARGET)

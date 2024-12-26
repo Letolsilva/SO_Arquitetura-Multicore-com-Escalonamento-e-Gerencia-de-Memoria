@@ -36,7 +36,7 @@ int main()
     {
         for (int i = 0; i < NUM_CORE; ++i)
         {
-            int *coreIndex = new int(i); // apenas a thread_cpu
+            int *coreIndex = new int(i); 
             int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, coreIndex);
             if (status_cpu != 0)
             {
