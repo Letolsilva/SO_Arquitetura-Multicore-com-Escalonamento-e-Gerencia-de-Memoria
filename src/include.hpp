@@ -12,8 +12,8 @@
 #include <pthread.h>
 #include <mutex>
 #include <semaphore.h>
-#include <random> 
 #include <sched.h>
+#include <random>
 #include <algorithm>
 
 #define NUM_PERIFERICOS 5
@@ -29,7 +29,6 @@ extern unordered_map<int, int> cache;
 extern vector<int> principal;
 extern vector<vector<int>> disco;
 extern vector<mutex> mutexCores;
-extern sem_t semaforoCores;
 
 extern bool perifericos[NUM_PERIFERICOS];
 
@@ -37,15 +36,16 @@ struct Processo
 {
     int quantum;
     int timestamp;
-    int id; // Identificador do processo (se necessário)
+    int id;
 };
 
 struct PCB
 {
-    int id;                    // ID do processo
-    int quantum;               // Quantum inicial
-    int timestamp;             // Timestamp inicial
-    int tempoEspera; 
+    int id;        // ID do processo
+    int quantum;   // Quantum inicial
+    int timestamp; // Timestamp inicial
+    int tempoEspera;
+    int resultado;
     string nomeArquivo;        // Nome do arquivo associado
     vector<string> instrucoes; // Instruções do processo
 };

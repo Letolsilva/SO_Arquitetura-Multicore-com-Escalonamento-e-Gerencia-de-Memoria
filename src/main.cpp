@@ -8,30 +8,30 @@ int CLOCK = 0;
 string diretorio = "data";
 bool perifericos[NUM_PERIFERICOS] = {false};
 vector<int> principal;
-sem_t semaforoCores; // Definição do semáforo
+
 vector<mutex> mutexCores(NUM_CORE);
 vector<int> processosNaMemoria;
 
 int main()
 {
-    // Bootloader ------------------------------------ //
+    ofstream arquivo("output.data", ios::trunc);
+    if (!arquivo.is_open())
+    {
+        cerr << "Erro ao inicializar o arquivo output.data!" << endl;
+    }
+    arquivo.close();
+
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
-    pthread_t thread_cpu[NUM_CORE]; // Criar múltiplas threads de CPU
-    // ------------------------------------------------ //
+    pthread_t thread_cpu[NUM_CORE];
 
     int status_memoria = povoando_Memoria(thread_memoria, diretorio);
     pthread_join(thread_memoria, nullptr);
 
-    // Inicializa o SO com os processos carregados
     int status_so = iniciando_SO(thread_so, processosNaMemoria);
 
     if (status_memoria == 0 && status_so == 0)
     {
-        printProcessos();
-        imprimirListaCircular_SO(); // Confirmação dos processos carregados no SO
-
-        // Criar threads para CPU (multicore)
         for (int i = 0; i < NUM_CORE; ++i)
         {
             int *coreIndex = new int(i); // apenas a thread_cpu
@@ -44,13 +44,12 @@ int main()
               
         }
 
-        // Aguardar o término das threads da CPU
         for (int i = 0; i < NUM_CORE; ++i)
         {
             pthread_join(thread_cpu[i], nullptr);
         }
     }
 
-    pthread_join(thread_so, nullptr); // Aguardar o término da thread do SO
+    pthread_join(thread_so, nullptr);
     return 0;
 }

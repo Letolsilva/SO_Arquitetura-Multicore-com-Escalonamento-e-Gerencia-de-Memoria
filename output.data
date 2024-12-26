@@ -1,0 +1,48 @@
+=== Processo ID: 1 ===
+Quantum Inicial: 29
+Timestamp Inicial: 0
+Instruções:
+  - = 0 3
+  - = 1 2
+  - + 0 1 0
+Resultado: 5
+Quantum Final: 20
+Timestamp Final: 9
+=============================
+
+=== Processo ID: 2 ===
+Quantum Inicial: 46
+Timestamp Inicial: 0
+Instruções:
+  - = 1 2
+  - = 0 2
+  - - 1 2 3
+Resultado: 0
+Quantum Final: 37
+Timestamp Final: 9
+=============================
+
+=== Processo ID: 3 ===
+Quantum Inicial: 23
+Timestamp Inicial: 0
+Instruções:
+  - = 1 2
+  - = 4 5
+  - + 2 1 6
+Resultado: 2
+Quantum Final: 14
+Timestamp Final: 9
+=============================
+
+=== Processo ID: 4 ===
+Quantum Inicial: 26
+Timestamp Inicial: 0
+Instruções:
+  - = 0 2
+  - = 1 5
+  - + 3 0 1
+Resultado: 7
+Quantum Final: 17
+Timestamp Final: 9
+=============================
+
