@@ -20,9 +20,12 @@ int main()
     }
     arquivo.close();
 
+
+    // ---------------- Bootloader ------------------//
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     pthread_t thread_cpu[NUM_CORE];
+    // ----------------------------------------------//
 
     int status_memoria = povoando_Memoria(thread_memoria, diretorio);
     pthread_join(thread_memoria, nullptr);
