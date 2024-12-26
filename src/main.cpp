@@ -11,6 +11,7 @@ vector<int> principal;
 
 vector<mutex> mutexCores(NUM_CORE);
 vector<int> processosNaMemoria;
+
 int main()
 {
     ofstream arquivo("output.data", ios::trunc);
@@ -33,14 +34,14 @@ int main()
     {
         for (int i = 0; i < NUM_CORE; ++i)
         {
-            int *coreIndex = new int(i);
-            cout << *coreIndex << endl;
+            int *coreIndex = new int(i); // apenas a thread_cpu
             int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, coreIndex);
             if (status_cpu != 0)
             {
                 cerr << "Erro ao criar a thread da CPU!" << endl;
                 return 1;
             }
+              
         }
 
         for (int i = 0; i < NUM_CORE; ++i)

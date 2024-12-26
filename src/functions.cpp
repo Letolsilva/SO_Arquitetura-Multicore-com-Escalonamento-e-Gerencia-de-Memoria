@@ -20,12 +20,20 @@ Processo criarProcesso(int quantumInicial, int idProcesso)
 
 void *processarProcesso(void *arg)
 {
-    (void)arg;
-    int *registradores = new int[8]();
 
+    int coreIndex = *(int*)arg;
+    delete (int*)arg; // Liberar a memória alocada
+
+    int cpu = sched_getcpu();
+
+    int *registradores = new int[8](); // Registradores do processo
+    int var = 0;
+    
     while (true)
     {
         int idProcesso = obterProximoProcesso();
+        cout << "Thread_CPU" << coreIndex << " processando processo ID=" << idProcesso << " no núcleo " << cpu << endl;
+
         if (idProcesso == -1)
         {
             usleep(1000); // Aguarde se não houver processos
@@ -57,6 +65,14 @@ void *processarProcesso(void *arg)
 
         PCB processoAtual = paginaAtual.pcb;
         int quantumInicial = processoAtual.quantum;
+
+       
+        for (const auto &instrucao : processoAtual.instrucoes) {
+            try 
+            {
+                UnidadeControle(registradores, instrucao, processoAtual.quantum);               
+            } catch (const runtime_error &e) 
+              
         cout << "Processando processo ID=" << idProcesso << endl;
         stringstream ss;
         ss << "=== Processo ID: " << idProcesso << " ===" << endl;
@@ -82,6 +98,12 @@ void *processarProcesso(void *arg)
                 break;
             }
         }
+
+        cout << "Final da Pipeline: Quantum = " << processoAtual.quantum << endl;
+        var += (quantumInicial - processoAtual.quantum);
+        processoAtual.timestamp += var; 
+        cout << " timestamp do processo: " <<processoAtual.timestamp << endl;
+        usleep(1000); // Simular tempo de execução do processo
 
         ss << "Resultado: " << processoAtual.resultado << endl;
         ss << "Quantum Final: " << processoAtual.quantum << endl;
@@ -115,3 +137,4 @@ void salvarNoArquivo(const string &conteudo)
         cerr << "Erro ao abrir o arquivo output.data!" << endl;
     }
 }
+

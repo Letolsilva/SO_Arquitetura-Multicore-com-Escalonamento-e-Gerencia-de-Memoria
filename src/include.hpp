@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <mutex>
 #include <semaphore.h>
+#include <sched.h>
 #include <random>
 #include <algorithm>
 
