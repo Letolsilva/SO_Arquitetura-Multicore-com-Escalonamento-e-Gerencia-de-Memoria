@@ -11,6 +11,7 @@ vector<int> principal;
 sem_t semaforoCores; // Definição do semáforo
 vector<mutex> mutexCores(NUM_CORE);
 vector<int> processosNaMemoria;
+
 int main()
 {
     // Bootloader ------------------------------------ //
@@ -33,13 +34,14 @@ int main()
         // Criar threads para CPU (multicore)
         for (int i = 0; i < NUM_CORE; ++i)
         {
-            int *coreIndex = new int(i);
+            int *coreIndex = new int(i); // apenas a thread_cpu
             int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, coreIndex);
             if (status_cpu != 0)
             {
                 cerr << "Erro ao criar a thread da CPU!" << endl;
                 return 1;
             }
+              
         }
 
         // Aguardar o término das threads da CPU

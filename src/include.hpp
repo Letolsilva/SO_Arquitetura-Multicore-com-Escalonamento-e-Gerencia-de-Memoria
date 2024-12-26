@@ -13,6 +13,7 @@
 #include <mutex>
 #include <semaphore.h>
 #include <random> 
+#include <sched.h>
 #include <algorithm>
 
 #define NUM_PERIFERICOS 5

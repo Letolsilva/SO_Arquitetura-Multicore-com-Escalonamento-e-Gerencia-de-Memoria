@@ -20,13 +20,20 @@ Processo criarProcesso(int quantumInicial, int idProcesso)
 
 void *processarProcesso(void *arg)
 {
-    (void)arg;
-    int *registradores = new int[8](); // Registradores do processo
+    int coreIndex = *(int*)arg;
+    delete (int*)arg; // Liberar a memória alocada
 
+    int cpu = sched_getcpu();
+
+    int *registradores = new int[8](); // Registradores do processo
+    int var = 0;
+    
     while (true)
     {
         // Obter o próximo processo da lista circular
         int idProcesso = obterProximoProcesso();
+        cout << "Thread_CPU" << coreIndex << " processando processo ID=" << idProcesso << " no núcleo " << cpu << endl;
+
         if (idProcesso == -1)
         {
             usleep(1000); // Aguarde se não houver processos
@@ -64,15 +71,18 @@ void *processarProcesso(void *arg)
         int quantumInicial = processoAtual.quantum;
        
         for (const auto &instrucao : processoAtual.instrucoes) {
-            try {
+            try 
+            {
                 UnidadeControle(registradores, instrucao, processoAtual.quantum);               
-            } catch (const runtime_error &e) {
+            } catch (const runtime_error &e) 
+            {
                 cout << "Quantum esgotado para o processo ID=" << idProcesso << ". Interrompendo execução." << endl;
                 break;
             }
         }
         cout << "Final da Pipeline: Quantum = " << processoAtual.quantum << endl;
-        processoAtual.timestamp += (quantumInicial - processoAtual.quantum); 
+        var += (quantumInicial - processoAtual.quantum);
+        processoAtual.timestamp += var; 
         cout << " timestamp do processo: " <<processoAtual.timestamp << endl;
         usleep(1000); // Simular tempo de execução do processo
 
@@ -89,5 +99,3 @@ void *processarProcesso(void *arg)
 }
 // colocar vetor para simbolizar a ordem de quem ja foi usado , michel deu o nome de SO
 // pipeline é uma barreira
-
-// gerar um output, timestamp 
