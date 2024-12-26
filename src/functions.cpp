@@ -31,6 +31,7 @@ void *processarProcesso(void *arg)
     
     while (true)
     {
+        
         int idProcesso = obterProximoProcesso();
         cout << "Thread_CPU" << coreIndex << " processando processo ID=" << idProcesso << " no núcleo " << cpu << endl;
 
@@ -43,6 +44,7 @@ void *processarProcesso(void *arg)
         // Buscar a página associada ao processo
         Page paginaAtual;
         bool encontrou = false;
+        PCB processoAtual;
 
         {
             lock_guard<mutex> lock(mutexProcessos);
@@ -63,28 +65,10 @@ void *processarProcesso(void *arg)
             continue;
         }
 
-        PCB processoAtual = paginaAtual.pcb;
+        paginaAtual.pcb.timestamp = var;
+        processoAtual = paginaAtual.pcb;
         int quantumInicial = processoAtual.quantum;
-
        
-        for (const auto &instrucao : processoAtual.instrucoes) {
-            try 
-            {
-                UnidadeControle(registradores, instrucao, processoAtual.quantum);               
-            } catch (const runtime_error &e) 
-              
-        cout << "Processando processo ID=" << idProcesso << endl;
-        stringstream ss;
-        ss << "=== Processo ID: " << idProcesso << " ===" << endl;
-        ss << "Quantum Inicial: " << quantumInicial << endl;
-        ss << "Timestamp Inicial: " << processoAtual.timestamp << endl;
-        ss << "Instruções:" << endl;
-
-        for (const auto &instrucao : processoAtual.instrucoes)
-        {
-            ss << "  - " << instrucao << endl;
-        }
-
         for (const auto &instrucao : processoAtual.instrucoes)
         {
             try
@@ -99,15 +83,27 @@ void *processarProcesso(void *arg)
             }
         }
 
+        cout << "Processando processo ID=" << idProcesso << endl;
+        stringstream ss;
+        ss << "=== Processo ID: " << idProcesso << " ===" << endl;
+        ss << "Quantum Inicial: " << quantumInicial << endl;
+        ss << "Timestamp Inicial: " << processoAtual.timestamp << endl;
+        ss << "Instruções:" << endl;
+
+        for (const auto &instrucao : processoAtual.instrucoes)
+        {
+            ss << "  - " << instrucao << endl;
+        }
+
         cout << "Final da Pipeline: Quantum = " << processoAtual.quantum << endl;
         var += (quantumInicial - processoAtual.quantum);
-        processoAtual.timestamp += var; 
+        processoAtual.timestamp = var; 
+
         cout << " timestamp do processo: " <<processoAtual.timestamp << endl;
-        usleep(1000); // Simular tempo de execução do processo
+        usleep(1000); // Simular tempo de execução do processoo9a
 
         ss << "Resultado: " << processoAtual.resultado << endl;
         ss << "Quantum Final: " << processoAtual.quantum << endl;
-        processoAtual.timestamp += (quantumInicial - processoAtual.quantum);
         ss << "Timestamp Final: " << processoAtual.timestamp << endl;
         ss << "=============================" << endl;
         cout << ss.str();
@@ -126,7 +122,8 @@ void *processarProcesso(void *arg)
 
 void salvarNoArquivo(const string &conteudo)
 {
-    ofstream arquivo("output.data", ios::app);
+    filesystem::create_directories("./output");
+    ofstream arquivo("./output/output.data", ios::app);
     if (arquivo.is_open())
     {
         arquivo << conteudo << endl;

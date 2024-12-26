@@ -8,13 +8,12 @@ int CLOCK = 0;
 string diretorio = "data";
 bool perifericos[NUM_PERIFERICOS] = {false};
 vector<int> principal;
-
 vector<mutex> mutexCores(NUM_CORE);
 vector<int> processosNaMemoria;
 
 int main()
 {
-    ofstream arquivo("output.data", ios::trunc);
+    ofstream arquivo("./output/output.data", ios::trunc);
     if (!arquivo.is_open())
     {
         cerr << "Erro ao inicializar o arquivo output.data!" << endl;
@@ -41,7 +40,6 @@ int main()
                 cerr << "Erro ao criar a thread da CPU!" << endl;
                 return 1;
             }
-              
         }
 
         for (int i = 0; i < NUM_CORE; ++i)
