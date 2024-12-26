@@ -31,7 +31,6 @@ void *processarProcesso(void *arg)
     
     while (true)
     {
-        
         int idProcesso = obterProximoProcesso();
         cout << "Thread_CPU" << coreIndex << " processando processo ID=" << idProcesso << " no núcleo " << cpu << endl;
 
@@ -62,7 +61,8 @@ void *processarProcesso(void *arg)
 
         if (!encontrou)
         {
-            continue;
+            break;
+          //  continue;
         }
 
         paginaAtual.pcb.timestamp = var;

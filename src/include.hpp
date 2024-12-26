@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #define NUM_PERIFERICOS 5
-#define NUM_CORE 2
+#define NUM_CORE 3
 
 using namespace std;
 namespace fs = filesystem;
