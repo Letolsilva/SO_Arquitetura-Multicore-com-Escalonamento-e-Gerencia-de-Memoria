@@ -33,7 +33,7 @@ void *processarProcesso(void *arg)
     auto registradores = std::make_unique<int[]>(8);
     int var = 0;
 
-    while (true)
+    while(true)
     {
         int idProcesso = obterProximoProcesso();
 
@@ -53,29 +53,24 @@ void *processarProcesso(void *arg)
         }
 
         processoAtual.estado = EXECUTANDO;
-        int quantumInicial = processoAtual.quantum;
+        int quantumInicial = processoAtual.quantum; // 0
 
         stringstream ss;
         ss << "Thread_CPU" << coreIndex << " processando processo ID=" << processoAtual.id << endl;
         ss << "Estado: " << obterEstadoProcesso(processoAtual) << endl;
 
+        int timestamp_inicial = var;
+
         // Executar as instruções do processo
         processarInstrucoes(processoAtual);
 
+        var += (quantumInicial - processoAtual.quantum);
+        processoAtual.timestamp += var;
+        
         // Atualizar timestamp e salvar no arquivo
-        atualizarESalvarProcesso(processoAtual, ss, quantumInicial, var);
+        atualizarESalvarProcesso(processoAtual, ss, quantumInicial, timestamp_inicial);
 
         usleep(1000);
-
-        // Finaliza a execução do processo
-        ss << "Resultado: " << processoAtual.resultado << endl;
-        ss << "Quantum Final: " << processoAtual.quantum << endl;
-        ss << "Timestamp Final: " << processoAtual.timestamp << endl;
-        ss << "Prioridade: " << processoAtual.prioridade << endl;
-        ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;
-        ss << "=============================" << endl;
-
-        salvarNoArquivo(ss.str());
 
         if (memoryPages.empty())
         {
@@ -99,14 +94,9 @@ bool buscarProcessoNaMemoria(int idProcesso, Page &paginaAtual, PCB &processoAtu
             paginaAtual = *it;
             memoryPages.erase(it);
             encontrou = true;
+            processoAtual = paginaAtual.pcb;
             break;
         }
-    }
-
-    if (encontrou)
-    {
-        processoAtual = paginaAtual.pcb;
-        processoAtual.timestamp = 0; // Inicializando timestamp
     }
 
     return encontrou;
@@ -151,11 +141,11 @@ void processarInstrucoes(PCB &processoAtual)
 }
 
 // Função que atualiza o processo e salva as informações no arquivo
-void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int quantumInicial, int &var)
-{
+void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &var)
+{    
     ss << "=== Processo ID: " << processoAtual.id << " ===" << endl;
     ss << "Quantum Inicial: " << quantumInicial << endl;
-    ss << "Timestamp Inicial: " << processoAtual.timestamp << endl;
+    ss << "Timestamp Inicial: " << var << endl;
     ss << "Instruções:" << endl;
 
     for (const auto &instrucao : processoAtual.instrucoes)
@@ -163,6 +153,14 @@ void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int quantumI
         ss << "  - " << instrucao << endl;
     }
 
-    var += (quantumInicial - processoAtual.quantum);
-    processoAtual.timestamp = var;
+    // Finaliza a execução do processo
+    ss << "Resultado: " << processoAtual.resultado << endl;
+    ss << "Quantum Final: " << processoAtual.quantum << endl;
+    ss << "Timestamp Final: " << processoAtual.timestamp << endl;
+    ss << "Prioridade: " << processoAtual.prioridade << endl;
+    ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;
+    ss << "=============================" << endl;
+    cout << ss.str();
+
+    salvarNoArquivo(ss.str());
 }
