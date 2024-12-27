@@ -46,3 +46,13 @@ int iniciando_SO(pthread_t &thread_SO, vector<int> processos)
 
     return 0;
 }
+
+void imprimirProcessosEsperando()
+{
+    lock_guard<mutex> lock(mutexListaCircular);
+    cout << "Processos esperando:" << endl;
+    for (int id : listaCircular_SO)
+    {
+        cout << "Processo ID: " << id << endl;
+    }
+}

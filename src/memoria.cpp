@@ -6,9 +6,9 @@ void carregarProcessosNaMemoria(const string &diretorio)
 {
     int idAtual = 1;
 
-    random_device rd;                        // Gerador baseado em hardware
-    mt19937 gen(rd());                       // Mersenne Twister para gerar números pseudoaleatórios
-    uniform_int_distribution<> dist(20, 50); // Define o intervalo [20, 50]
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(20, 50);
 
     for (const auto &entry : fs::directory_iterator(diretorio))
     {
@@ -19,6 +19,9 @@ void carregarProcessosNaMemoria(const string &diretorio)
             pcb.nomeArquivo = entry.path().string();
             pcb.quantum = dist(gen);
             pcb.timestamp = CLOCK;
+            pcb.estado = PRONTO;
+            pcb.prioridade = dist(gen) % 10; // Define prioridade aleatória
+            pcb.registradores.resize(8, 0);
 
             ifstream arquivo(pcb.nomeArquivo);
             string linha;
@@ -34,7 +37,6 @@ void carregarProcessosNaMemoria(const string &diretorio)
             nova_pagina_memoria.pcb = pcb;
 
             memoryPages.push_back(nova_pagina_memoria);
-
             atualizarListaCircular(pcb.id);
         }
     }

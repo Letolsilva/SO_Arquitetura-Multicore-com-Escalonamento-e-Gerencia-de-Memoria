@@ -22,6 +22,13 @@
 using namespace std;
 namespace fs = filesystem;
 
+enum EstadoProcesso
+{
+    PRONTO,
+    BLOQUEADO,
+    EXECUTANDO
+};
+
 extern int PC;
 extern int CLOCK;
 
@@ -32,20 +39,17 @@ extern vector<mutex> mutexCores;
 
 extern bool perifericos[NUM_PERIFERICOS];
 
-struct Processo
-{
-    int quantum;
-    int timestamp;
-    int id;
-};
-
 struct PCB
 {
-    int id;        // ID do processo
-    int quantum;   // Quantum inicial
-    int timestamp; // Timestamp inicial
-    int tempoEspera;
-    int resultado;
+    int id;          // ID do processo
+    int quantum;     // Quantum inicial
+    int timestamp;   // Timestamp inicial
+    int prioridade;  // Prioridade do processo
+    int baseMemoria; // Endereço base de memória
+    int limiteMemoria;
+    int resultado;             // Limite de alocação de memória
+    vector<int> registradores; // Banco de registradores
+    EstadoProcesso estado;     // Estado atual do processo
     string nomeArquivo;        // Nome do arquivo associado
     vector<string> instrucoes; // Instruções do processo
 };

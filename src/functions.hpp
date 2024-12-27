@@ -2,9 +2,11 @@
 #define FUNCTIONS_HPP
 #include "include.hpp"
 
-Processo criarProcesso(int quantumInicial, int idProcesso);
 void *processarProcesso(void *arg);
 void salvarNoArquivo(const string &conteudo);
-void atualizarStatusCores();
+bool buscarProcessoNaMemoria(int idProcesso, Page &paginaAtual, PCB &processoAtual);
+string obterEstadoProcesso(const PCB &processo);
+void processarInstrucoes(PCB &processoAtual);
+void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int quantumInicial, int &var);
 
 #endif
