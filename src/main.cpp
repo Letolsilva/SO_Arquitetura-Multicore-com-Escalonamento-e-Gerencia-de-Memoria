@@ -13,19 +13,19 @@ vector<int> processosNaMemoria;
 
 int main()
 {
-    ofstream arquivo("./output/output.data", ios::trunc);
-    if (!arquivo.is_open())
-    {
-        cerr << "Erro ao inicializar o arquivo output.data!" << endl;
-    }
-    arquivo.close();
-
 
     // ---------------- Bootloader ------------------//
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     pthread_t thread_cpu[NUM_CORE];
     // ----------------------------------------------//
+
+    ofstream arquivo("./output/output.data", ios::trunc);
+    if (!arquivo.is_open())
+    {
+        cerr << "Erro ao inicializar o arquivo output.data!" << endl;
+    }
+    arquivo.close();
 
     int status_memoria = povoando_Memoria(thread_memoria, diretorio);
     pthread_join(thread_memoria, nullptr);

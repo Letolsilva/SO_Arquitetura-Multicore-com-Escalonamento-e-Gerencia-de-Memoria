@@ -5,6 +5,8 @@
 void carregarProcessosNaMemoria(const string &diretorio)
 {
     int idAtual = 1;
+    int baseAtual = 0, limiteAtual = 1;
+
 
     random_device rd;
     mt19937 gen(rd());
@@ -20,6 +22,8 @@ void carregarProcessosNaMemoria(const string &diretorio)
             pcb.quantum = dist(gen);
             pcb.timestamp = CLOCK;
             pcb.estado = PRONTO;
+            pcb.baseMemoria = baseAtual++;
+            pcb.limiteMemoria = limiteAtual++;
             pcb.prioridade = dist(gen) % 10; // Define prioridade aleatória
             pcb.registradores.resize(8, 0);
 

@@ -1,0 +1,76 @@
+Thread_CPU0 processando processo ID=1
+Estado: EXECUTANDO
+=== Processo ID: 1 ===
+Nome Arquivo: data/processo4.data
+Base Memoria: 0
+Limite Memoria: 1
+Quantum Inicial: 35
+Timestamp Inicial: 0
+Instruções:
+  - = 0 2
+  - = 1 5
+  - + 3 0 1
+Resultado: 7
+Quantum Final: 26
+Timestamp Final: 9
+Prioridade: 3
+Estado Final: PRONTO
+=============================
+
+Thread_CPU2 processando processo ID=2
+Estado: EXECUTANDO
+=== Processo ID: 2 ===
+Nome Arquivo: data/processo3.data
+Base Memoria: 1
+Limite Memoria: 2
+Quantum Inicial: 21
+Timestamp Inicial: 0
+Instruções:
+  - = 1 2
+  - = 0 2
+  - - 1 2 3
+Resultado: 0
+Quantum Final: 12
+Timestamp Final: 9
+Prioridade: 0
+Estado Final: PRONTO
+=============================
+
+Thread_CPU1 processando processo ID=3
+Estado: EXECUTANDO
+=== Processo ID: 3 ===
+Nome Arquivo: data/processo2.data
+Base Memoria: 2
+Limite Memoria: 3
+Quantum Inicial: 21
+Timestamp Inicial: 0
+Instruções:
+  - = 1 2
+  - = 4 5
+  - + 2 1 6
+Resultado: 2
+Quantum Final: 12
+Timestamp Final: 9
+Prioridade: 1
+Estado Final: PRONTO
+=============================
+
+Thread_CPU0 processando processo ID=4
+Estado: EXECUTANDO
+=== Processo ID: 4 ===
+Nome Arquivo: data/processo1.data
+Base Memoria: 3
+Limite Memoria: 4
+Quantum Inicial: 33
+Timestamp Inicial: 9
+Instruções:
+  - = 0 3
+  - = 1 2
+  - + 0 1 0
+Resultado: 5
+Quantum Final: 24
+Timestamp Final: 18
+Prioridade: 1
+Estado Final: PRONTO
+=============================
+

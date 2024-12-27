@@ -144,6 +144,9 @@ void processarInstrucoes(PCB &processoAtual)
 void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &var)
 {    
     ss << "=== Processo ID: " << processoAtual.id << " ===" << endl;
+    ss << "Nome Arquivo: " << processoAtual.nomeArquivo << endl;
+    ss << "Base Memoria: " << processoAtual.baseMemoria << endl;
+    ss << "Limite Memoria: " << processoAtual.limiteMemoria << endl;
     ss << "Quantum Inicial: " << quantumInicial << endl;
     ss << "Timestamp Inicial: " << var << endl;
     ss << "Instruções:" << endl;
