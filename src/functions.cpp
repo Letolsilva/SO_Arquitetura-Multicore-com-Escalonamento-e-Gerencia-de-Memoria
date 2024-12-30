@@ -33,7 +33,7 @@ void *processarProcesso(void *arg)
     auto registradores = std::make_unique<int[]>(8);
     int var = 0;
 
-    while(true)
+    while (true)
     {
         int idProcesso = obterProximoProcesso();
 
@@ -62,11 +62,10 @@ void *processarProcesso(void *arg)
         int timestamp_inicial = var;
 
         // Executar as instruções do processo
-        processarInstrucoes(processoAtual);
+        processarInstrucoes(processoAtual, ss);
 
         var += (quantumInicial - processoAtual.quantum);
         processoAtual.timestamp += var;
-        
         // Atualizar timestamp e salvar no arquivo
         atualizarESalvarProcesso(processoAtual, ss, quantumInicial, timestamp_inicial);
 
@@ -113,13 +112,13 @@ string obterEstadoProcesso(const PCB &processo)
 }
 
 // Função que processa as instruções do processo
-void processarInstrucoes(PCB &processoAtual)
+void processarInstrucoes(PCB &processoAtual, stringstream &ss)
 {
     for (const auto &instrucao : processoAtual.instrucoes)
     {
         if (processoAtual.quantum <= 0)
         {
-            cout << "Quantum esgotado para o processo ID=" << processoAtual.id << ". Preempcao ocorrida." << endl;
+            ss << "Quantum esgotado para o processo ID=" << processoAtual.id << ". Preempcao ocorrida." << endl;
             processoAtual.estado = PRONTO;
             atualizarListaCircular(processoAtual.id);
             break;
@@ -129,6 +128,7 @@ void processarInstrucoes(PCB &processoAtual)
         {
             processoAtual.estado = EXECUTANDO;
             UnidadeControle(processoAtual.registradores.data(), instrucao, processoAtual.quantum, processoAtual);
+            atualizarListaCircular(processoAtual.id);
             processoAtual.estado = PRONTO;
         }
         catch (const runtime_error &e)
@@ -142,7 +142,7 @@ void processarInstrucoes(PCB &processoAtual)
 
 // Função que atualiza o processo e salva as informações no arquivo
 void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &var)
-{    
+{
     ss << "=== Processo ID: " << processoAtual.id << " ===" << endl;
     ss << "Nome Arquivo: " << processoAtual.nomeArquivo << endl;
     ss << "Base Memoria: " << processoAtual.baseMemoria << endl;
@@ -163,7 +163,7 @@ void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantum
     ss << "Prioridade: " << processoAtual.prioridade << endl;
     ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;
     ss << "=============================" << endl;
-    cout << ss.str();
+    // cout << ss.str();
 
     salvarNoArquivo(ss.str());
 }
