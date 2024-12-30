@@ -135,6 +135,7 @@ void processarInstrucoes(PCB &processoAtual, stringstream &ss)
         {
             cout << "Erro durante execução do processo ID=" << processoAtual.id << endl;
             processoAtual.estado = BLOQUEADO;
+           // atualizarListaCircular(processoAtual.id);
             break;
         }
     }

@@ -62,6 +62,14 @@ struct Page
     pthread_t thread; // Thread associada ao processo
 };
 
+struct ThreadArgs {
+    pthread_t thread_memoria;
+    pthread_t thread_so;
+    pthread_t *thread_cpu;
+    vector<int> processosNaMemoria;
+};
+
+
 //----Memoria
 extern vector<Page> memoryPages;
 extern int currentPageIndex;

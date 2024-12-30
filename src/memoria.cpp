@@ -2,11 +2,43 @@
 #include "SO.hpp"
 #include "functions.hpp"
 
+void imprimirMemoria()
+{
+    cout << "========== Conteúdo da Memória ==========" << endl;
+    for (size_t i = 0; i < memoryPages.size(); ++i)
+    {
+        const Page &pagina = memoryPages[i];
+        const PCB &pcb = pagina.pcb;
+
+        cout << "Página: " << i << endl;
+        cout << "  Base: " << pagina.base << endl;
+        cout << "  Limite: " << pagina.limit << endl;
+        cout << "  PCB ID: " << pcb.id << endl;
+        cout << "  Nome do Arquivo: " << pcb.nomeArquivo << endl;
+        cout << "  Quantum: " << pcb.quantum << endl;
+        cout << "  Timestamp: " << pcb.timestamp << endl;
+        cout << "  Estado: " << (pcb.estado == PRONTO ? "Pronto" : "Outro") << endl;
+        cout << "  Prioridade: " << pcb.prioridade << endl;
+        cout << "  Registradores: ";
+        for (const auto &reg : pcb.registradores)
+        {
+            cout << reg << " ";
+        }
+        cout << endl;
+        cout << "  Instruções: " << endl;
+        for (size_t j = 0; j < pcb.instrucoes.size(); ++j)
+        {
+            cout << "    [" << j << "] " << pcb.instrucoes[j] << endl;
+        }
+        cout << "-----------------------------------------" << endl;
+    }
+    cout << "=========================================" << endl;
+}
+
 void carregarProcessosNaMemoria(const string &diretorio)
 {
     int idAtual = 1;
     int baseAtual = 0, limiteAtual = 1;
-
 
     random_device rd;
     mt19937 gen(rd());
@@ -16,6 +48,7 @@ void carregarProcessosNaMemoria(const string &diretorio)
     {
         if (entry.path().extension() == ".data")
         {
+            cout <<  entry.path().string() << endl;
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();

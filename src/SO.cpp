@@ -9,9 +9,8 @@ mutex mutexListaCircular;
 void atualizarListaCircular(int idProcesso)
 {
     lock_guard<mutex> lock(mutexListaCircular);
-
     // Verifica se o processo já está na lista
-    auto it = std::find(listaCircular_SO.begin(), listaCircular_SO.end(), idProcesso);
+    auto it = find(listaCircular_SO.begin(), listaCircular_SO.end(), idProcesso);
     if (it == listaCircular_SO.end())
     {
         listaCircular_SO.push_back(idProcesso); // Adiciona apenas se não existir
