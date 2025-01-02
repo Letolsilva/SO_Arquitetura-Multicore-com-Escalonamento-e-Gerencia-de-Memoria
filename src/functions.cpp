@@ -1,4 +1,5 @@
 #include "unidadeControle.hpp"
+#include "monitora.hpp"
 #include "memoria.hpp"
 #include "functions.hpp"
 #include "SO.hpp"
@@ -53,6 +54,7 @@ void *processarProcesso(void *arg)
         }
 
         processoAtual.estado = EXECUTANDO;
+        atualizarEstadoProcesso(processoAtual.id, "EXECUTANDO");
         int quantumInicial = processoAtual.quantum; // 0
 
         stringstream ss;
@@ -119,23 +121,28 @@ void processarInstrucoes(PCB &processoAtual, stringstream &ss)
         if (processoAtual.quantum <= 0)
         {
             ss << "Quantum esgotado para o processo ID=" << processoAtual.id << ". Preempcao ocorrida." << endl;
-            processoAtual.estado = PRONTO;
+            processoAtual.estado = BLOQUEADO;
+            atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
             atualizarListaCircular(processoAtual.id);
             break;
         }
-
         try
         {
             processoAtual.estado = EXECUTANDO;
+            atualizarEstadoProcesso(processoAtual.id, "EXECUTANDO");
             UnidadeControle(processoAtual.registradores.data(), instrucao, processoAtual.quantum, processoAtual);
             atualizarListaCircular(processoAtual.id);
             processoAtual.estado = PRONTO;
+            atualizarEstadoProcesso(processoAtual.id, "PRONTO");
+
         }
         catch (const runtime_error &e)
         {
             cout << "Erro durante execução do processo ID=" << processoAtual.id << endl;
             processoAtual.estado = BLOQUEADO;
-           // atualizarListaCircular(processoAtual.id);
+            atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
+            usleep(1000000);
+            atualizarListaCircular(processoAtual.id);
             break;
         }
     }

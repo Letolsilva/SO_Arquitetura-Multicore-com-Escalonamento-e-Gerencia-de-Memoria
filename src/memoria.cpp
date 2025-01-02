@@ -48,7 +48,6 @@ void carregarProcessosNaMemoria(const string &diretorio)
     {
         if (entry.path().extension() == ".data")
         {
-            cout <<  entry.path().string() << endl;
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();

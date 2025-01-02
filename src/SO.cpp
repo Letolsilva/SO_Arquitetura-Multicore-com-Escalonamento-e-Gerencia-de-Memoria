@@ -14,6 +14,7 @@ void atualizarListaCircular(int idProcesso)
     if (it == listaCircular_SO.end())
     {
         listaCircular_SO.push_back(idProcesso); // Adiciona apenas se não existir
+        estadosProcessos[idProcesso] = "PRONTO";
     }
 }
 
@@ -24,6 +25,7 @@ void *fazerListaCircular_SO(void *arg)
     {
         atualizarListaCircular(id);
     }
+
     return nullptr;
 }
 
@@ -38,17 +40,23 @@ int obterProximoProcesso()
     // Pega o próximo processo da lista circular
     int idProcesso = listaCircular_SO[indiceAtual];
 
-    // Move o processo atual para o final da lista
-    listaCircular_SO.push_back(idProcesso);
+    // Remove o processo atual da lista
     listaCircular_SO.erase(listaCircular_SO.begin() + indiceAtual);
 
-    // O índice atual vai sempre para o próximo processo
-    // O próximo índice será o 0, pois removemos o primeiro elemento
-    indiceAtual = 0;
+    // Ajusta o índice atual
+    if (listaCircular_SO.empty())
+    {
+        indiceAtual = 0; // Reseta o índice se a lista estiver vazia
+    }
+    else
+    {
+        indiceAtual = indiceAtual % listaCircular_SO.size(); // Garante que o índice esteja válido
+    }
 
     // Retorna o ID do processo retirado da lista
     return idProcesso;
 }
+
 
 int iniciando_SO(pthread_t &thread_SO, vector<int> processos)
 {

@@ -4,6 +4,40 @@
 #include "include.hpp"
 #include "SO.hpp"
 
+unordered_map<int, string> estadosProcessos;
+bool monitorando = true; // Controle do loop de monitoramento
+
+// Chamada sempre que o estado de um processo é alterado
+void atualizarEstadoProcesso(int idProcesso, const string &novoEstado)
+{
+    {
+        lock_guard<mutex> lock(mutexListaCircular);
+        estadosProcessos[idProcesso] = novoEstado;
+    }
+    // Log da alteração
+    // cout << "[DEBUG] Processo ID=" << idProcesso << " mudou para " << novoEstado << endl;
+}
+
+void *monitorarEstados(void *)
+{
+    while (monitorando)
+    {
+        {
+            lock_guard<mutex> lock(mutexListaCircular);
+            for (const auto &[id, estado] : estadosProcessos)
+            {
+                if(estado == "BLOQUEADO"){
+                    cout << " Processo ID =  "<< id << "- BLOQUEADO" << endl;
+                }
+            }
+        }
+        usleep(1000000); // Pausa por 1 segundo
+    }
+    pthread_exit(nullptr);
+}
+
+
+
 void* start(void* arg){
     string diretorio = "data";
     vector<int>* processosNaMemoria = static_cast<vector<int>*>(arg);
@@ -12,6 +46,7 @@ void* start(void* arg){
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     pthread_t thread_cpu[NUM_CORE];
+    pthread_t threadMonitor ={};
     // ----------------------------------------------//
 
     ofstream arquivo("./output/output.data", ios::trunc);
@@ -25,6 +60,8 @@ void* start(void* arg){
     pthread_join(thread_memoria, nullptr);
 
     int status_so = iniciando_SO(thread_so, *processosNaMemoria);
+
+    pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
 
     if (status_memoria == 0 && status_so == 0) {
         for (int i = 0; i < NUM_CORE; ++i) {
@@ -42,6 +79,9 @@ void* start(void* arg){
     }
 
     pthread_join(thread_so, nullptr);
+    monitorando = false;
+    pthread_join(threadMonitor, nullptr);
+
     return nullptr;  // Indica que a thread terminou
 }
 

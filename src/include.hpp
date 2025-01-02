@@ -62,13 +62,12 @@ struct Page
     pthread_t thread; // Thread associada ao processo
 };
 
-struct ThreadArgs {
-    pthread_t thread_memoria;
-    pthread_t thread_so;
-    pthread_t *thread_cpu;
-    vector<int> processosNaMemoria;
-};
-
+// struct ThreadArgs {
+//     pthread_t thread_memoria;
+//     pthread_t thread_so;
+//     pthread_t *thread_cpu;
+//     vector<int> processosNaMemoria;
+// };
 
 //----Memoria
 extern vector<Page> memoryPages;
@@ -80,5 +79,7 @@ extern mutex mutexProcessos; //?
 extern vector<int> listaCircular_SO;
 extern size_t indiceAtual;
 extern mutex mutexListaCircular;
+extern unordered_map<int, string> estadosProcessos; // Mapeia o ID do processo para seu estado
+
 
 #endif
