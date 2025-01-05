@@ -1,4 +1,5 @@
-<h1 align="center" font-size="200em"><b>Simulador da Arquitetura de Von Neumann e Pipeline MIPS</b></h1>
+<h1 align="center" font-size="200em"><b>Simulador da Arquitetura de Von Neumann com Pipeline MIPS, Escalonamento FCFS e
+Gerencia de Memória</b></h1>
 
 <div align = "center" >
 <!-- imagem -->
@@ -8,6 +9,29 @@
 ![Linguagem](https://img.shields.io/badge/Linguagem-C%2B%2B-blue)
 
 </div>
+
+## Abstração da CPU
+
+Confira abaixo o diagrama que ilustra a abstração da CPU, em conjunto com o sistema operacional e a memória.
+
+![Diagrama da CPU](./imgs/diagramaMulticore.jpeg)
+
+## Arquivos de entrada e saída
+
+### Input 
+
+**Observação:** Os arquivos de input devem obrigatoriamente estar no formato **.data**.  
+É possível alterar essa configuração no código antes da execução. Certifique-se de armazená-los na pasta **data**.
+
+
+![Exemplo de Input](./imgs/input.png)
+
+### Output
+
+O arquivo de saída sera armazenado na pasta **output**
+
+![Exemplo de Output](./imgs/output3.png)
+
 
 ## 👾Compilação e execução
 

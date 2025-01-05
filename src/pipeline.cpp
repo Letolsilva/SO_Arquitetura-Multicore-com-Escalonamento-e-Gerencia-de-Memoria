@@ -26,7 +26,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     int soma = 0, registradorAtual = info1;
 
     // Executa a operação na ULA
-
     if (instrucao == '=')
     {
         registradores[info1] = info2;

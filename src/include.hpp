@@ -45,7 +45,7 @@ struct PCB
     int quantum;     // Quantum inicial
     int timestamp;   // Timestamp inicial
     int prioridade;  // Prioridade do processo
-    int baseMemoria; // Endereço base de memória
+    int baseMemoria;            // Endereço base de memória
     int limiteMemoria;
     int resultado;             // Limite de alocação de memória
     vector<int> registradores; // Banco de registradores
