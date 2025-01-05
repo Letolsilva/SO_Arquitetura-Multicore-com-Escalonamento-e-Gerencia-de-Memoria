@@ -1,5 +1,4 @@
-<h1 align="center" font-size="200em"><b>Simulador da Arquitetura de Von Neumann com Pipeline MIPS, Escalonamento FCFS e
-Gerencia de Memória</b></h1>
+<h1 align="center" font-size="200em"><b>Simulador da Arquitetura Multicore de Von Neumann com Suporte a Preempção</b></h1>
 
 <div align = "center" >
 <!-- imagem -->
@@ -10,9 +9,9 @@ Gerencia de Memória</b></h1>
 
 </div>
 
-## Abstração da CPU
+## Abstração da Arquitetura Multicore
 
-Confira abaixo o diagrama que ilustra a abstração da CPU, em conjunto com o sistema operacional e a memória.
+Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore, em conjunto com a CPU, o sistema operacional e a memória.
 
 ![Diagrama da CPU](./imgs/diagramaMulticore.jpeg)
 
