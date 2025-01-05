@@ -28,7 +28,7 @@ Confira abaixo o diagrama que ilustra a abstração da CPU, em conjunto com o si
 
 ### Output
 
-O arquivo de saída sera armazenado na pasta **output**
+O arquivo de saída sera armazenado na pasta **output**.
 
 ![Exemplo de Output](./imgs/output3.png)
 
