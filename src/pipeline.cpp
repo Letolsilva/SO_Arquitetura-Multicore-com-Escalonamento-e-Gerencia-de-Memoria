@@ -54,18 +54,18 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     }
     else if (instrucao == '?')
     {
-        cout << registradores[info1] << " " << info4 << " " << registradores[info2] << ": ";
+        // cout << registradores[info1] << " " << info4 << " " << registradores[info2] << ": ";
         if (info4 == "<")
         {
             if (registradores[info1] < registradores[info2])
             {
-                cout << "True" << endl;
+                // cout << "True" << endl;
                 quantum--;
                 CLOCK++;
             }
             else
             {
-                cout << "False" << endl;
+                // cout << "False" << endl;
                 quantum--;
                 CLOCK++;
             }
@@ -74,13 +74,13 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
         {
             if (registradores[info1] > registradores[info2])
             {
-                cout << "True" << endl;
+                // cout << "True" << endl;
                 quantum--;
                 CLOCK++;
             }
             else
             {
-                cout << "False" << endl;
+                // cout << "False" << endl;
                 quantum--;
                 CLOCK++;
             }
@@ -89,13 +89,13 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
         {
             if (registradores[info1] == registradores[info2])
             {
-                cout << "True" << endl;
+                // cout << "True" << endl;
                 quantum--;
                 CLOCK++;
             }
             else
             {
-                cout << "False" << endl;
+                // cout << "False" << endl;
                 quantum--;
                 CLOCK++;
             }
@@ -104,13 +104,13 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
         {
             if (registradores[info1] != registradores[info2])
             {
-                cout << "True" << endl;
+                // cout << "True" << endl;
                 quantum--;
                 CLOCK++;
             }
             else
             {
-                cout << "False" << endl;
+                // cout << "False" << endl;
                 quantum--;
                 CLOCK++;
             }
