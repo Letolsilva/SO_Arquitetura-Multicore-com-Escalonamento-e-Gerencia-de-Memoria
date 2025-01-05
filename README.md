@@ -14,7 +14,11 @@
 Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore, em conjunto com a CPU, o sistema operacional e a memória.
 
 ![Diagrama da CPU](./imgs/diagramaMulticore.jpeg)
-
+    <p>
+        Acesse o  <a href="https://www.overleaf.com/read/jygddzvfxprd#bbeb2d" target="_blank" rel="noopener noreferrer">
+        Artigo
+    </a> com toda a documentação clicando no link.
+    </p>
 ## Arquivos de entrada e saída
 
 ### Input 
@@ -23,7 +27,8 @@ Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore, em
 É possível alterar essa configuração no código antes da execução. Certifique-se de armazená-los na pasta **data**.
 
 
-![Exemplo de Input](./imgs/input.png)
+![image](https://github.com/user-attachments/assets/04db3269-4307-45f1-90e6-526c314faadd)
+
 
 ### Output
 
@@ -43,7 +48,7 @@ O arquivo de saída sera armazenado na pasta **output**.
   | `make clean` | Apaga a última compilação realizada contida na pasta build                              |
   | `make`       | Executa a compilação do programa utilizando o gcc, e o resultado vai para a pasta build |
   | `make run`   | Executa o programa da pasta build após a realização da compilação                       |
-
+   
 ## Contato
 
 <div>
