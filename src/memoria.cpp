@@ -2,6 +2,17 @@
 #include "SO.hpp"
 #include "functions.hpp"
 
+unordered_map<string, int> temposExecucao = {
+    {"+", 5}, // Soma
+    {"*", 5}, // Multiplicação
+    {"-", 5}, // Subtração
+    {"/", 5}, // Divisão
+    {"=", 2}, // Igual
+    {"&", 2}, // Leitura
+    {"?", 3}, // Condicional (<, >, =, !=)
+    {"@", 5}  // Loop (o cálculo de tempo adicional depende de (info3 - 1) e será feito dinamicamente)
+};
+
 void imprimirMemoria()
 {
     cout << "========== Conteúdo da Memória ==========" << endl;
@@ -35,10 +46,33 @@ void imprimirMemoria()
     cout << "=========================================" << endl;
 }
 
+void salvarNaMemoria(PCB *processo){
+    for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
+    {
+        if (it->pcb.id == processo->id)
+        {
+            it->pcb.registradores = processo->registradores;
+            if(static_cast<int>(processo->historico_quantum.size())!= 0){
+                it->pcb.historico_quantum = processo->historico_quantum;
+
+            }
+            it->pcb.resultado = processo->resultado;
+            it->pcb.quantum = processo->quantum;
+            it->pcb.estado = processo->estado;
+            it->pcb.pc = processo->pc;
+            
+            break;
+        }
+    }
+}
+
 void carregarProcessosNaMemoria(const string &diretorio)
 {
     int idAtual = 1;
     int baseAtual = 0, limiteAtual = 1;
+
+    string linha, instrucao;
+    int info1, info2, info3;
 
     random_device rd;
     mt19937 gen(rd());
@@ -51,19 +85,41 @@ void carregarProcessosNaMemoria(const string &diretorio)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
-            pcb.quantum = dist(gen);
+            //pcb.quantum = dist(gen);
+            pcb.quantum = 10;
+            pcb.historico_quantum.push_back(pcb.quantum);
             pcb.timestamp = CLOCK;
             pcb.estado = PRONTO;
             pcb.baseMemoria = baseAtual++;
+            pcb.pc = 0;
+            pcb.ciclo_de_vida = 0;
             pcb.limiteMemoria = limiteAtual++;
-            pcb.prioridade = dist(gen) % 10; // Define prioridade aleatória
+            pcb.prioridade = dist(gen) % 10;
             pcb.registradores.resize(8, 0);
 
             ifstream arquivo(pcb.nomeArquivo);
-            string linha;
+
             while (getline(arquivo, linha))
             {
                 pcb.instrucoes.push_back(linha);
+                stringstream ss(linha);
+                ss >> instrucao >> info1 >> info2 >> info3;
+
+                auto it = temposExecucao.find(instrucao);
+                if (it != temposExecucao.end())
+                {
+                    pcb.ciclo_de_vida += it->second;
+                }
+                else
+                {
+                    cout << "Instrucao: " << instrucao << " não encontrada no map." << endl;
+                }
+
+                if (instrucao == "@")
+                {
+                    int tempoAdicional = (info3 - 1) + temposExecucao["@"];
+                    pcb.ciclo_de_vida += tempoAdicional;
+                }
             }
             arquivo.close();
 

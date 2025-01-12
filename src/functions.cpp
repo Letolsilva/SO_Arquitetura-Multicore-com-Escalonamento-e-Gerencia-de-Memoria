@@ -7,6 +7,7 @@
 vector<PCB> memoria;
 vector<Page> memoryPages; // Memoria
 mutex mutexProcessos;     // Mutex para controle de acesso ao vetor
+mutex output;
 
 // Função auxiliar para salvar no arquivo
 void salvarNoArquivo(const string &conteudo)
@@ -37,6 +38,15 @@ void *processarProcesso(void *arg)
     while (true)
     {
         int idProcesso = obterProximoProcesso();
+        int timestamp_inicial=0;
+
+        if (idProcesso == -1)
+        {
+            cout << "Nenhum processo disponível, thread encerrando." << endl;
+            break;
+        }
+
+        timestamp_inicial = var;
 
         if (idProcesso == -1)
         {
@@ -50,37 +60,71 @@ void *processarProcesso(void *arg)
         // Buscar o processo na memória
         if (!buscarProcessoNaMemoria(idProcesso, paginaAtual, processoAtual))
         {
+            pthread_exit(nullptr);
             break; // Se não encontrar o processo, termina o loop
         }
 
-        processoAtual.estado = EXECUTANDO;
-        atualizarEstadoProcesso(processoAtual.id, "EXECUTANDO");
-        int quantumInicial = processoAtual.quantum; // 0
+        if(processoAtual.estado != BLOQUEADO){
+            processoAtual.timestamp_inicial = timestamp_inicial;
+            for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
+            {
+                if (it->pcb.id == processoAtual.id)
+                { 
+                    PCB pcbAtual = it->pcb;
+                    it->pcb.timestamp_inicial = processoAtual.timestamp_inicial;
+                    break;
+                }
+            }
+        }
 
+        if(processoAtual.quantum == 0 && processoAtual.estado == BLOQUEADO){
+            processoAtual.quantum = 30;
+            processoAtual.historico_quantum.push_back( processoAtual.quantum);
+            processoAtual.estado = PRONTO;
+            atualizarEstadoProcesso(processoAtual.id, "PRONTO");
+            salvarNaMemoria(&processoAtual);
+
+        }
+
+        int quantumInicial = processoAtual.quantum;
+       
         stringstream ss;
         ss << "Thread_CPU" << coreIndex << " processando processo ID=" << processoAtual.id << endl;
         ss << "Estado: " << obterEstadoProcesso(processoAtual) << endl;
 
-        int timestamp_inicial = var;
-
         // Executar as instruções do processo
-        processarInstrucoes(processoAtual, ss);
+        processarInstrucoes(processoAtual);
 
-        var += (quantumInicial - processoAtual.quantum);
+        var += abs(quantumInicial - processoAtual.quantum);
         processoAtual.timestamp += var;
-        // Atualizar timestamp e salvar no arquivo
-        atualizarESalvarProcesso(processoAtual, ss, quantumInicial, timestamp_inicial);
+        //cout << "\t timestamp: " << processoAtual.timestamp << endl;
 
+        if(processoAtual.estado == TERMINADO){
+
+            lock_guard<mutex> lock(mutexProcessos);
+            for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
+            {
+                if (it->pcb.id == processoAtual.id)
+                { 
+                    PCB pcbAtual = it->pcb;
+                    atualizarESalvarProcesso(it->pcb,ss, quantumInicial, var);
+                    memoryPages.erase(it);
+                    break;
+                }
+               
+            }
+                
+        }
         usleep(1000);
-
-        if (memoryPages.empty())
-        {
+        if (listaCircular_SO.empty())
+        {   
             break;
         }
     }
 
     pthread_exit(nullptr);
 }
+
 
 // Função que busca o processo na memória
 bool buscarProcessoNaMemoria(int idProcesso, Page &paginaAtual, PCB &processoAtual)
@@ -93,7 +137,6 @@ bool buscarProcessoNaMemoria(int idProcesso, Page &paginaAtual, PCB &processoAtu
         if (it->pcb.id == idProcesso)
         {
             paginaAtual = *it;
-            memoryPages.erase(it);
             encontrou = true;
             processoAtual = paginaAtual.pcb;
             break;
@@ -110,68 +153,115 @@ string obterEstadoProcesso(const PCB &processo)
         return "PRONTO";
     if (processo.estado == BLOQUEADO)
         return "BLOQUEADO";
+    if (processo.estado == TERMINADO)
+        return "TERMINADO";
     return "EXECUTANDO";
 }
 
-// Função que processa as instruções do processo
-void processarInstrucoes(PCB &processoAtual, stringstream &ss)
-{
-    for (const auto &instrucao : processoAtual.instrucoes)
-    {
-        if (processoAtual.quantum <= 0)
-        {
-            ss << "Quantum esgotado para o processo ID=" << processoAtual.id << ". Preempcao ocorrida." << endl;
-            processoAtual.estado = BLOQUEADO;
-            atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
-            atualizarListaCircular(processoAtual.id);
-            break;
-        }
-        try
-        {
-            processoAtual.estado = EXECUTANDO;
-            atualizarEstadoProcesso(processoAtual.id, "EXECUTANDO");
-            UnidadeControle(processoAtual.registradores.data(), instrucao, processoAtual.quantum, processoAtual);
-            atualizarListaCircular(processoAtual.id);
-            processoAtual.estado = PRONTO;
-            atualizarEstadoProcesso(processoAtual.id, "PRONTO");
+void *monitorQuantum(void *args) {
+    ThreadArgs* threadArgs = static_cast<ThreadArgs*>(args);
 
+    // Acessar os argumentos
+    PCB* processoAtual = threadArgs->processoAtual;
+
+    if (processoAtual == nullptr) {
+        cerr << "Erro: 'processoAtual' é nulo na função monitorQuantum." << endl;
+        pthread_exit(nullptr);
+    }
+
+    processoAtual->estado = EXECUTANDO;
+    atualizarEstadoProcesso(processoAtual->id, "EXECUTANDO");
+
+    while (processoAtual->quantum > 0 && processoAtual->estado != BLOQUEADO &&  static_cast<int>(processoAtual->instrucoes.size())  > processoAtual->pc){
+        UnidadeControle(processoAtual->registradores.data(),processoAtual->instrucoes[processoAtual->pc], processoAtual->quantum, *processoAtual);
+    }
+
+    //Aqui faz a verificacao do job está bloqueado para colocar na lista novamente
+    if (processoAtual->quantum <= 0 && processoAtual->estado == BLOQUEADO)
+    {
+        if( static_cast<int>(processoAtual->instrucoes.size())  > processoAtual->pc){
+            cout << "Quantum esgotado para o processo ID=" << processoAtual->id << ". Bloqueio ocorridp." << "Parei: " << processoAtual->instrucoes[processoAtual->pc] << endl;
         }
-        catch (const runtime_error &e)
+        processoAtual->quantum = 0;
+        processoAtual->estado = BLOQUEADO;
+        atualizarEstadoProcesso(processoAtual->id, "BLOQUEADO");
+        atualizarListaCircular(processoAtual->id);
+        salvarNaMemoria(processoAtual);
+        pthread_exit(nullptr);
+    }else{
+        //Aqui conclui o Job
+        Page paginaAtual;
+        lock_guard<mutex> lock(mutexProcessos);
         {
-            cout << "Erro durante execução do processo ID=" << processoAtual.id << endl;
-            processoAtual.estado = BLOQUEADO;
-            atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
-            usleep(1000000);
-            atualizarListaCircular(processoAtual.id);
-            break;
+            processoAtual->estado = TERMINADO;
+            atualizarEstadoProcesso(processoAtual->id, "TERMINADO");
+            salvarNaMemoria(processoAtual);
         }
     }
+
+    pthread_exit(nullptr);
+}
+
+// Função que processa as instruções do processo
+void processarInstrucoes(PCB &processoAtual)
+{
+    try
+    {   ThreadArgs args = { &processoAtual };
+        cout << "\n Abrindo thread id= " << processoAtual.id << " quantum= " << processoAtual.quantum << " estado= " << processoAtual.estado << endl;
+        pthread_t monitorThread = {};
+        int status_monitor = pthread_create(&monitorThread, nullptr, monitorQuantum, &args);
+        if (status_monitor != 0) {
+            cerr << "Erro ao criar a thread do monitor!" << endl;
+        }     
+    
+        // Aguarda a finalização da thread
+        pthread_join(monitorThread, nullptr);
+    }
+    catch (const runtime_error &e)
+    {
+        cout << "Erro durante execução do processo ID=" << processoAtual.id << endl;
+        processoAtual.estado = BLOQUEADO;
+        atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
+        usleep(1000000);
+        atualizarListaCircular(processoAtual.id);
+    }
+    
 }
 
 // Função que atualiza o processo e salva as informações no arquivo
-void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &var)
-{
-    ss << "=== Processo ID: " << processoAtual.id << " ===" << endl;
-    ss << "Nome Arquivo: " << processoAtual.nomeArquivo << endl;
-    ss << "Base Memoria: " << processoAtual.baseMemoria << endl;
-    ss << "Limite Memoria: " << processoAtual.limiteMemoria << endl;
-    ss << "Quantum Inicial: " << quantumInicial << endl;
-    ss << "Timestamp Inicial: " << var << endl;
-    ss << "Instruções:" << endl;
-
-    for (const auto &instrucao : processoAtual.instrucoes)
+void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &timestamp_final)
+{   
+    lock_guard<mutex> lock(output);
     {
-        ss << "  - " << instrucao << endl;
+        ss << "=== Processo ID: " << processoAtual.id << " ===" << endl;
+        ss << "Nome Arquivo: " << processoAtual.nomeArquivo << endl;
+        ss << "Base Memoria: " << processoAtual.baseMemoria << endl;
+        ss << "Limite Memoria: " << processoAtual.limiteMemoria << endl;
+        ss << "Quantum Inicial: " << quantumInicial << endl;
+        ss << "Quantum Historico: ";
+        for (const auto &x : processoAtual.historico_quantum)
+        {
+            ss << x << " - ";
+        }
+        ss << endl;
+        ss << "Timestamp Inicial: " << processoAtual.timestamp_inicial << endl;
+        ss << "Instruções:" << endl;
+
+        for (const auto &instrucao : processoAtual.instrucoes)
+        {
+            ss << "  - " << instrucao << endl;
+        }
+
+        // Finaliza a execução do processo
+        ss << "Resultado: " << processoAtual.resultado << endl;
+        ss << "Quantum Final: " << processoAtual.quantum << endl;
+        ss << "Timestamp Final: " << timestamp_final << endl;
+        ss << "PC: " << processoAtual.pc << endl;
+        ss << "Ciclo de Vida: " << processoAtual.ciclo_de_vida << endl;
+        ss << "Prioridade: " << processoAtual.prioridade << endl;
+        ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;
+        ss << "=============================" << endl;
+        salvarNoArquivo(ss.str());
     }
-
-    // Finaliza a execução do processo
-    ss << "Resultado: " << processoAtual.resultado << endl;
-    ss << "Quantum Final: " << processoAtual.quantum << endl;
-    ss << "Timestamp Final: " << processoAtual.timestamp << endl;
-    ss << "Prioridade: " << processoAtual.prioridade << endl;
-    ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;
-    ss << "=============================" << endl;
-    // cout << ss.str();
-
-    salvarNoArquivo(ss.str());
+    
 }

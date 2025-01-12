@@ -8,6 +8,7 @@ mutex mutexListaCircular;
 
 void atualizarListaCircular(int idProcesso)
 {
+
     lock_guard<mutex> lock(mutexListaCircular);
     // Verifica se o processo já está na lista
     auto it = find(listaCircular_SO.begin(), listaCircular_SO.end(), idProcesso);
@@ -15,6 +16,10 @@ void atualizarListaCircular(int idProcesso)
     {
         listaCircular_SO.push_back(idProcesso); // Adiciona apenas se não existir
         estadosProcessos[idProcesso] = "PRONTO";
+    }
+    else
+    {
+        cout << "Processo já está na fila: " << idProcesso << endl;
     }
 }
 
@@ -53,7 +58,6 @@ int obterProximoProcesso()
         indiceAtual = indiceAtual % listaCircular_SO.size(); // Garante que o índice esteja válido
     }
 
-    // Retorna o ID do processo retirado da lista
     return idProcesso;
 }
 
