@@ -163,6 +163,7 @@ int iniciando_SO(pthread_t &thread_SO)
             ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
             break;
         default:
+            return 1;
             break;
     }
 
