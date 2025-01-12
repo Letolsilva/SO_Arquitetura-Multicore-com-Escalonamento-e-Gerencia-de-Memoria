@@ -2,6 +2,8 @@
 #include "SO.hpp"
 #include "functions.hpp"
 
+mutex mutexMemoria;
+
 unordered_map<string, int> temposExecucao = {
     {"+", 5}, // Soma
     {"*", 5}, // Multiplicação
@@ -47,23 +49,29 @@ void imprimirMemoria()
 }
 
 void salvarNaMemoria(PCB *processo){
-    for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
-    {
-        if (it->pcb.id == processo->id)
-        {
-            it->pcb.registradores = processo->registradores;
-            if(static_cast<int>(processo->historico_quantum.size())!= 0){
-                it->pcb.historico_quantum = processo->historico_quantum;
 
+    lock_guard<mutex> lock(mutexMemoria);
+    {
+        for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
+        {
+            if (it->pcb.id == processo->id)
+            {
+                it->pcb.registradores = processo->registradores;
+                if(static_cast<int>(processo->historico_quantum.size())!= 0){
+                    it->pcb.historico_quantum = processo->historico_quantum;
+
+                }
+                it->pcb.resultado = processo->resultado;
+                it->pcb.quantum = processo->quantum;
+                it->pcb.estado = processo->estado;
+                it->pcb.pc = processo->pc;
+                
+                break;
             }
-            it->pcb.resultado = processo->resultado;
-            it->pcb.quantum = processo->quantum;
-            it->pcb.estado = processo->estado;
-            it->pcb.pc = processo->pc;
-            
-            break;
         }
+
     }
+   
 }
 
 void carregarProcessosNaMemoria(const string &diretorio)

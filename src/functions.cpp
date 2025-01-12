@@ -124,7 +124,7 @@ void *processarProcesso(void *arg)
         }
         usleep(1000);
 
-        if (listaCircular_SO_2.empty() || memoryPages.empty())
+        if (listaCircular_SO_2.empty())
         {   
             break;
         }
@@ -189,7 +189,7 @@ void *monitorQuantum(void *args) {
     {
         lock_guard<mutex> lock(mutexProcessos);
         if( static_cast<int>(processoAtual->instrucoes.size())  > processoAtual->pc){
-            cout << "Quantum esgotado para o processo ID=" << processoAtual->id << ". Bloqueio ocorridp." << "Parei: " << processoAtual->instrucoes[processoAtual->pc] << endl;
+            cout << "Quantum esgotado para o processo ID=" << processoAtual->id << ". Bloqueio ocorrido." << "Parei: " << processoAtual->instrucoes[processoAtual->pc] << endl;
         }
         processoAtual->quantum = 0;
         add_ListaCircular(*processoAtual);
@@ -202,9 +202,11 @@ void *monitorQuantum(void *args) {
         Page paginaAtual;
         lock_guard<mutex> lock(mutexProcessos);
         {
+            cout << "Job concluido ID=" << processoAtual->id << "..." << endl;
             processoAtual->estado = TERMINADO;
             atualizarEstadoProcesso(processoAtual->id, "TERMINADO");
             salvarNaMemoria(processoAtual);
+            remover_ListaCircular(processoAtual->id);
         }
     }
 

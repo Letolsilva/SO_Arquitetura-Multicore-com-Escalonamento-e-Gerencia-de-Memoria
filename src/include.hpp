@@ -78,7 +78,8 @@ struct SO
 extern vector<Page> memoryPages;
 extern int currentPageIndex;
 extern vector<PCB> memoria;  //?
-extern mutex mutexProcessos; //?
+extern mutex mutexProcessos;
+extern mutex mutexMemoria;
 extern mutex output;
 
 //----SO

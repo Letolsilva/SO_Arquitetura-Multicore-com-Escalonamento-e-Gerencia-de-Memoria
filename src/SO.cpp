@@ -7,6 +7,27 @@ vector<SO> listaCircular_SO_2;
 size_t indiceAtual = 0;
 mutex mutexListaCircular;
 
+void remover_ListaCircular(int id_processo)
+{
+    lock_guard<mutex> lock(mutexListaCircular);
+    
+    auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
+            [id_processo](const SO& so) { return so.id_processo == id_processo; });
+    
+    if (it != listaCircular_SO_2.end())
+    {
+        // Remove o processo encontrado
+        listaCircular_SO_2.erase(it);
+        cout << "Processo removido da lista: " << id_processo << endl;
+    }
+    else
+    {
+        // Caso o processo não esteja na lista
+        cout << "Processo não encontrado na lista: " << id_processo << endl;
+    }
+}
+
+
 void add_ListaCircular(PCB processo)
 {
     lock_guard<mutex> lock(mutexListaCircular);
@@ -93,7 +114,7 @@ int obterProximoProcesso()
 
     // Remove o processo atual da lista
     listaCircular_SO_2.erase(listaCircular_SO_2.begin() + indiceAtual);
-    cout << "\t {Removi:  " << idProcesso << endl;
+    cout << "\n\t ----{Removi:  " << idProcesso << endl;
 
     // Ajusta o índice atual
     if (listaCircular_SO_2.empty())

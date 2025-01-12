@@ -10,5 +10,6 @@ void imprimirListaCircular();
 void add_ListaCircular(PCB processo);
 void *FCFS(void *arg);
 void *First_Job_First(void *arg);
+void remover_ListaCircular(int id_processo);
 
 #endif
