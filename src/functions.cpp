@@ -78,7 +78,11 @@ void *processarProcesso(void *arg)
         }
 
         if(processoAtual.quantum == 0 && processoAtual.estado == BLOQUEADO){
-            processoAtual.quantum = 30;
+
+            random_device rd;
+            mt19937 gen(rd());
+            uniform_int_distribution<> dist(0, 20);
+            processoAtual.quantum = dist(gen);;
             processoAtual.historico_quantum.push_back( processoAtual.quantum);
             processoAtual.estado = PRONTO;
             atualizarEstadoProcesso(processoAtual.id, "PRONTO");

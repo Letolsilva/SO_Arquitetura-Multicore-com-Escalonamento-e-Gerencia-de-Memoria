@@ -76,7 +76,7 @@ void carregarProcessosNaMemoria(const string &diretorio)
 
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> dist(20, 50);
+    uniform_int_distribution<> dist(0, 20);
 
     for (const auto &entry : fs::directory_iterator(diretorio))
     {
@@ -85,8 +85,8 @@ void carregarProcessosNaMemoria(const string &diretorio)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
-            //pcb.quantum = dist(gen);
-            pcb.quantum = 10;
+            pcb.quantum = dist(gen);
+            //pcb.quantum = 10;
             pcb.historico_quantum.push_back(pcb.quantum);
             pcb.timestamp = CLOCK;
             pcb.estado = PRONTO;

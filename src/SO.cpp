@@ -63,7 +63,16 @@ int obterProximoProcesso()
 
 
 int iniciando_SO(pthread_t &thread_SO, vector<int> processos)
-{
+{   
+    int op;
+    cout <<  "\n\n\t ----------{Escolha a Politica de Escalanomento}---------- "<< endl;
+    cout <<  "\n\t\t [1] = FCFS.";
+    cout <<  "\n\t\t [2] = Shortest Job First";
+    cout <<  "\n\t\t [3] = Prioridade";
+    cout <<  "\n\t\t [>] = ";
+    cin>>op;
+    cout <<  "\n\n\t --------------------------------------------------------- "<< endl;
+
     int ret = pthread_create(&thread_SO, nullptr, fazerListaCircular_SO, &processos);
 
     if (ret != 0)
