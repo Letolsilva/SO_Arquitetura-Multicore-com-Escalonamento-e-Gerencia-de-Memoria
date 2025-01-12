@@ -57,19 +57,6 @@ void gerarLista(){
     }
 }
 
-/*
-void *ordenar_Shortest_Job_First(void *arg)
-{
-    if(!listaCircular_SO_2.empty()){
-        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b) {
-            return a.ciclo_de_vida < b.ciclo_de_vida;
-        });
-    }
-    
-    return nullptr;
-}
-*/
-
 void *FCFS(void *arg)
 {
     (void)arg;
@@ -88,6 +75,20 @@ void *First_Job_First(void *arg)
         lock_guard<mutex> lock(mutexListaCircular);
         sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b) {
             return a.ciclo_de_vida < b.ciclo_de_vida;
+        });
+    }
+    
+    return nullptr;
+}
+
+void *Prioridade(void *arg)
+{
+    (void)arg;
+
+    while(!listaCircular_SO_2.empty()){
+        lock_guard<mutex> lock(mutexListaCircular);
+        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b) {
+            return a.prioridade > b.prioridade;
         });
     }
     
@@ -157,9 +158,9 @@ int iniciando_SO(pthread_t &thread_SO)
             break;
         case 2:
             ret = pthread_create(&thread_SO, nullptr, First_Job_First, nullptr);
-            cout << " TAM " << memoryPages.size() << endl;
             break;
         case 3:
+            ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
             break;
         default:
             break;
