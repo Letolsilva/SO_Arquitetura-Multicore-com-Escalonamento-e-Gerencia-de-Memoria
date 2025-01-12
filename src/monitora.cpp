@@ -28,6 +28,7 @@ void *monitorarEstados(void *)
             {
                 if(estado == "BLOQUEADO"){
                     cout << " Processo ID =  "<< id << "- BLOQUEADO" << endl;
+                    usleep(1000000); // Pausa por 1 segundo
                 }
             }
         }
@@ -41,12 +42,13 @@ void *monitorarEstados(void *)
 void* start(void* arg){
     string diretorio = "data";
     vector<int>* processosNaMemoria = static_cast<vector<int>*>(arg);
-
+    (void)processosNaMemoria;
+    
     // ---------------- Bootloader ------------------//
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     pthread_t thread_cpu[NUM_CORE];
-    pthread_t threadMonitor ={};
+   // pthread_t threadMonitor ={};
     // ----------------------------------------------//
 
     ofstream arquivo("./output/output.data", ios::trunc);
@@ -59,9 +61,9 @@ void* start(void* arg){
     int status_memoria = povoando_Memoria(thread_memoria, diretorio);
     pthread_join(thread_memoria, nullptr);
 
-    int status_so = iniciando_SO(thread_so, *processosNaMemoria);
+    int status_so = iniciando_SO(thread_so);
 
-    pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
+   // pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
 
     if (status_memoria == 0 && status_so == 0) {
         for (int i = 0; i < NUM_CORE; ++i) {
@@ -78,9 +80,11 @@ void* start(void* arg){
         }
     }
 
+    imprimirListaCircular();
+
     pthread_join(thread_so, nullptr);
     monitorando = false;
-    pthread_join(threadMonitor, nullptr);
+  //  pthread_join(threadMonitor, nullptr);
 
     return nullptr;  // Indica que a thread terminou
 }

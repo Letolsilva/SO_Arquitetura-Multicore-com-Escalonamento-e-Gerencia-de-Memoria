@@ -2,11 +2,13 @@
 #define SO_HPP
 #include "include.hpp"
 
-void *fazerListaCircular_SO(void *arg);
-int iniciando_SO(pthread_t &thread_SO, vector<int> processos);
-void atualizarListaCircular(int idProcesso);
+int iniciando_SO(pthread_t &thread_SO);
 int obterProximoProcesso();
 void imprimirProcessosEsperando();
 void imprimirListaCircular();
+
+void add_ListaCircular(PCB processo);
+void *FCFS(void *arg);
+void *First_Job_First(void *arg);
 
 #endif

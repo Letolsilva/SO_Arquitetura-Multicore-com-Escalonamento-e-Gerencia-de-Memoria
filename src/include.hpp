@@ -67,6 +67,13 @@ struct Page
     pthread_t thread; // Thread associada ao processo
 };
 
+struct SO
+{
+    int id_processo;
+    int ciclo_de_vida;
+    int prioridade;
+};
+
 //----Memoria
 extern vector<Page> memoryPages;
 extern int currentPageIndex;
@@ -76,6 +83,7 @@ extern mutex output;
 
 //----SO
 extern vector<int> listaCircular_SO;
+extern vector<SO> listaCircular_SO_2;
 extern size_t indiceAtual;
 extern mutex mutexListaCircular;
 extern unordered_map<int, string> estadosProcessos; 

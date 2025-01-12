@@ -82,11 +82,14 @@ void *processarProcesso(void *arg)
             random_device rd;
             mt19937 gen(rd());
             uniform_int_distribution<> dist(0, 20);
-            processoAtual.quantum = dist(gen);;
+            //processoAtual.quantum = dist(gen);
+            processoAtual.quantum = 15;
+            cout << "\n\t tava bloqueado: " << processoAtual.id <<"novo quantum= " <<  processoAtual.quantum <<endl;
             processoAtual.historico_quantum.push_back( processoAtual.quantum);
             processoAtual.estado = PRONTO;
             atualizarEstadoProcesso(processoAtual.id, "PRONTO");
             salvarNaMemoria(&processoAtual);
+            add_ListaCircular(processoAtual);
 
         }
 
@@ -120,7 +123,8 @@ void *processarProcesso(void *arg)
                 
         }
         usleep(1000);
-        if (listaCircular_SO.empty())
+
+        if (listaCircular_SO_2.empty() || memoryPages.empty())
         {   
             break;
         }
@@ -183,15 +187,16 @@ void *monitorQuantum(void *args) {
     //Aqui faz a verificacao do job está bloqueado para colocar na lista novamente
     if (processoAtual->quantum <= 0 && processoAtual->estado == BLOQUEADO)
     {
+        lock_guard<mutex> lock(mutexProcessos);
         if( static_cast<int>(processoAtual->instrucoes.size())  > processoAtual->pc){
             cout << "Quantum esgotado para o processo ID=" << processoAtual->id << ". Bloqueio ocorridp." << "Parei: " << processoAtual->instrucoes[processoAtual->pc] << endl;
         }
         processoAtual->quantum = 0;
-        processoAtual->estado = BLOQUEADO;
+        add_ListaCircular(*processoAtual);
         atualizarEstadoProcesso(processoAtual->id, "BLOQUEADO");
-        atualizarListaCircular(processoAtual->id);
         salvarNaMemoria(processoAtual);
         pthread_exit(nullptr);
+
     }else{
         //Aqui conclui o Job
         Page paginaAtual;
@@ -227,7 +232,7 @@ void processarInstrucoes(PCB &processoAtual)
         processoAtual.estado = BLOQUEADO;
         atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
         usleep(1000000);
-        atualizarListaCircular(processoAtual.id);
+        add_ListaCircular(processoAtual);
     }
     
 }

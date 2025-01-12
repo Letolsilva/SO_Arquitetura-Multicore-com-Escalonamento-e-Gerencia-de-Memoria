@@ -85,8 +85,8 @@ void carregarProcessosNaMemoria(const string &diretorio)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
-            pcb.quantum = dist(gen);
-            //pcb.quantum = 10;
+            pcb.quantum = 8;
+            //pcb.quantum = dist(gen);
             pcb.historico_quantum.push_back(pcb.quantum);
             pcb.timestamp = CLOCK;
             pcb.estado = PRONTO;
@@ -129,7 +129,8 @@ void carregarProcessosNaMemoria(const string &diretorio)
             nova_pagina_memoria.pcb = pcb;
 
             memoryPages.push_back(nova_pagina_memoria);
-            atualizarListaCircular(pcb.id);
+           // atualizarListaCircular(pcb.id);
+            //atualizarListaCircular_2(pcb);
         }
     }
 }
