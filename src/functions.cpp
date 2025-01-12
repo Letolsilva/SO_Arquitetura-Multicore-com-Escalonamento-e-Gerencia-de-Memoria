@@ -38,7 +38,7 @@ void *processarProcesso(void *arg)
     while (true)
     {
         int idProcesso = obterProximoProcesso();
-        int timestamp_inicial=0;
+        int timestamp_inicial = 0;
 
         if (idProcesso == -1)
         {
@@ -64,13 +64,14 @@ void *processarProcesso(void *arg)
             break; // Se não encontrar o processo, termina o loop
         }
 
-        if(processoAtual.estado != BLOQUEADO){
+        if (processoAtual.estado != BLOQUEADO)
+        {
             lock_guard<mutex> lock(mutexProcessos);
             processoAtual.timestamp_inicial = timestamp_inicial;
             for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
             {
                 if (it->pcb.id == processoAtual.id)
-                { 
+                {
                     PCB pcbAtual = it->pcb;
                     it->pcb.timestamp_inicial = processoAtual.timestamp_inicial;
                     break;
@@ -78,24 +79,24 @@ void *processarProcesso(void *arg)
             }
         }
 
-        if(processoAtual.quantum == 0 && processoAtual.estado == BLOQUEADO){
+        if (processoAtual.quantum == 0 && processoAtual.estado == BLOQUEADO)
+        {
             lock_guard<mutex> lock(mutexProcessos);
             random_device rd;
             mt19937 gen(rd());
             uniform_int_distribution<> dist(0, 20);
-            //processoAtual.quantum = dist(gen);
+            // processoAtual.quantum = dist(gen);
             processoAtual.quantum = 15;
-            cout << "\n\t tava bloqueado: " << processoAtual.id <<"novo quantum= " <<  processoAtual.quantum <<endl;
-            processoAtual.historico_quantum.push_back( processoAtual.quantum);
+            cout << "\n\t tava bloqueado: " << processoAtual.id << "novo quantum= " << processoAtual.quantum << endl;
+            processoAtual.historico_quantum.push_back(processoAtual.quantum);
             processoAtual.estado = PRONTO;
             atualizarEstadoProcesso(processoAtual.id, "PRONTO");
             salvarNaMemoria(&processoAtual);
             add_ListaCircular(processoAtual);
-
         }
 
         int quantumInicial = processoAtual.quantum;
-       
+
         stringstream ss;
         ss << "Thread_CPU" << coreIndex << " processando processo ID=" << processoAtual.id << endl;
         ss << "Estado: " << obterEstadoProcesso(processoAtual) << endl;
@@ -105,28 +106,27 @@ void *processarProcesso(void *arg)
 
         var += abs(quantumInicial - processoAtual.quantum);
         processoAtual.timestamp += var;
-        //cout << "\t timestamp: " << processoAtual.timestamp << endl;
+        // cout << "\t timestamp: " << processoAtual.timestamp << endl;
 
-        if(processoAtual.estado == TERMINADO){
+        if (processoAtual.estado == TERMINADO)
+        {
 
             lock_guard<mutex> lock(mutexProcessos);
             for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
             {
                 if (it->pcb.id == processoAtual.id)
-                { 
+                {
                     PCB pcbAtual = it->pcb;
-                    atualizarESalvarProcesso(it->pcb,ss, quantumInicial, var);
+                    atualizarESalvarProcesso(it->pcb, ss, quantumInicial, var);
                     memoryPages.erase(it);
                     break;
                 }
-               
             }
-                
         }
         usleep(1000);
 
         if (listaCircular_SO_2.empty())
-        {   
+        {
             break;
         }
     }
@@ -171,9 +171,10 @@ void *monitorQuantum(void *args) {
     ThreadArgs* threadArgs = static_cast<ThreadArgs*>(args);
 
     // Acessar os argumentos
-    PCB* processoAtual = threadArgs->processoAtual;
+    PCB *processoAtual = threadArgs->processoAtual;
 
-    if (processoAtual == nullptr) {
+    if (processoAtual == nullptr)
+    {
         cerr << "Erro: 'processoAtual' é nulo na função monitorQuantum." << endl;
         pthread_exit(nullptr);
     }
@@ -181,25 +182,31 @@ void *monitorQuantum(void *args) {
     processoAtual->estado = EXECUTANDO;
     atualizarEstadoProcesso(processoAtual->id, "EXECUTANDO");
 
-    while (processoAtual->quantum > 0 && processoAtual->estado != BLOQUEADO &&  static_cast<int>(processoAtual->instrucoes.size())  > processoAtual->pc){
-        UnidadeControle(processoAtual->registradores.data(),processoAtual->instrucoes[processoAtual->pc], processoAtual->quantum, *processoAtual);
+    while (processoAtual->quantum > 0 && processoAtual->estado != BLOQUEADO && static_cast<int>(processoAtual->instrucoes.size()) > processoAtual->pc)
+    {
+        UnidadeControle(processoAtual->registradores.data(), processoAtual->instrucoes[processoAtual->pc], processoAtual->quantum, *processoAtual);
     }
 
-    //Aqui faz a verificacao do job está bloqueado para colocar na lista novamente
+    // Aqui faz a verificacao do job está bloqueado para colocar na lista novamente
     if (processoAtual->quantum <= 0 && processoAtual->estado == BLOQUEADO)
     {
         lock_guard<mutex> lock(mutexProcessos);
-        if( static_cast<int>(processoAtual->instrucoes.size())  > processoAtual->pc){
+        if (static_cast<int>(processoAtual->instrucoes.size()) > processoAtual->pc)
+        {
             cout << "Quantum esgotado para o processo ID=" << processoAtual->id << ". Bloqueio ocorrido." << "Parei: " << processoAtual->instrucoes[processoAtual->pc] << endl;
+            stringstream ss;
+            ss << "Ocorreu Preempção no processo: " << processoAtual->id << endl;
+            salvarNoArquivo(ss.str());
         }
         processoAtual->quantum = 0;
         add_ListaCircular(*processoAtual);
         atualizarEstadoProcesso(processoAtual->id, "BLOQUEADO");
         salvarNaMemoria(processoAtual);
         pthread_exit(nullptr);
-
-    }else{
-        //Aqui conclui o Job
+    }
+    else
+    {
+        // Aqui conclui o Job
         Page paginaAtual;
         lock_guard<mutex> lock(mutexProcessos);
         {
@@ -218,14 +225,16 @@ void *monitorQuantum(void *args) {
 void processarInstrucoes(PCB &processoAtual)
 {
     try
-    {   ThreadArgs args = { &processoAtual };
+    {
+        ThreadArgs args = {&processoAtual};
         cout << "\n Abrindo thread id= " << processoAtual.id << " quantum= " << processoAtual.quantum << " estado= " << processoAtual.estado << endl;
         pthread_t monitorThread = {};
         int status_monitor = pthread_create(&monitorThread, nullptr, monitorQuantum, &args);
-        if (status_monitor != 0) {
+        if (status_monitor != 0)
+        {
             cerr << "Erro ao criar a thread do monitor!" << endl;
-        }     
-    
+        }
+
         // Aguarda a finalização da thread
         pthread_join(monitorThread, nullptr);
     }
@@ -237,12 +246,11 @@ void processarInstrucoes(PCB &processoAtual)
         usleep(1000000);
         add_ListaCircular(processoAtual);
     }
-    
 }
 
 // Função que atualiza o processo e salva as informações no arquivo
 void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &timestamp_final)
-{   
+{
     lock_guard<mutex> lock(output);
     {
         ss << "=== Processo ID: " << processoAtual.id << " ===" << endl;
@@ -275,5 +283,4 @@ void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantum
         ss << "=============================" << endl;
         salvarNoArquivo(ss.str());
     }
-    
 }
