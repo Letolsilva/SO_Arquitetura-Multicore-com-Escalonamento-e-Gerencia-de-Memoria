@@ -74,17 +74,22 @@ void salvarNaMemoria(PCB *processo){
    
 }
 
-void carregarProcessosNaMemoria(const string &diretorio)
+void carregarProcessosNaMemoria(int op)
 {
     int idAtual = 1;
     int baseAtual = 0, limiteAtual = 1;
+    //int* op_ptr = new int(op);
 
     string linha, instrucao;
+    string diretorio = "data";
     int info1, info2, info3;
 
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> dist(0, 20);
+
+            cout << "\t\t\t---- Opcaoooooo="<< op << "---> "<< endl;
+
 
     for (const auto &entry : fs::directory_iterator(diretorio))
     {
@@ -107,28 +112,39 @@ void carregarProcessosNaMemoria(const string &diretorio)
 
             ifstream arquivo(pcb.nomeArquivo);
 
+            
             while (getline(arquivo, linha))
             {
                 pcb.instrucoes.push_back(linha);
-                stringstream ss(linha);
-                ss >> instrucao >> info1 >> info2 >> info3;
 
-                auto it = temposExecucao.find(instrucao);
-                if (it != temposExecucao.end())
-                {
-                    pcb.ciclo_de_vida += it->second;
-                }
-                else
-                {
-                    cout << "Instrucao: " << instrucao << " não encontrada no map." << endl;
-                }
+                if(op==2){
+                    stringstream ss(linha);
+                    ss >> instrucao >> info1 >> info2 >> info3;
 
-                if (instrucao == "@")
+                    auto it = temposExecucao.find(instrucao);
+                    if (it != temposExecucao.end())
+                    {
+                        pcb.ciclo_de_vida += it->second;
+                    }
+                    else
+                    {
+                        cout << "Instrucao: " << instrucao << " não encontrada no map." << endl;
+                    }
+
+                    if (instrucao == "@")
+                    {
+                        int tempoAdicional = (info3 - 1) + temposExecucao["@"];
+                        pcb.ciclo_de_vida += tempoAdicional;
+                    }
+                }else
                 {
-                    int tempoAdicional = (info3 - 1) + temposExecucao["@"];
-                    pcb.ciclo_de_vida += tempoAdicional;
+                    pcb.ciclo_de_vida = 0;
+
                 }
             }
+            
+
+        
             arquivo.close();
 
             Page nova_pagina_memoria;
@@ -145,16 +161,18 @@ void carregarProcessosNaMemoria(const string &diretorio)
 
 void *threadCarregarProcessos(void *arg)
 {
-    string diretorio = *static_cast<string *>(arg);
-    carregarProcessosNaMemoria(diretorio);
+    int op = *static_cast<int *>(arg);
+    cout << "Recebido valor de op: " << op << endl;
+    carregarProcessosNaMemoria(op);
     return nullptr;
 }
 
-int povoando_Memoria(pthread_t &thread_memoria, string diretorio)
+int povoando_Memoria(pthread_t &thread_memoria, int op)
 {
+    int* op_thread = new int(op);
 
     // Thread_Memoria = Carregar todos os processos, paginando na memoria, lendo os inputs e colocando em wait, e o ret é apenas para verificação...
-    int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, &diretorio);
+    int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, op_thread);
 
     if (ret != 0)
     {

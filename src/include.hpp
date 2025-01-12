@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <pthread.h>
 #include <mutex>
+#include <chrono>
 #include <semaphore.h>
 #include <sched.h>
 #include <random>

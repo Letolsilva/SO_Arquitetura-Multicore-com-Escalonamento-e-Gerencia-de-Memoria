@@ -27,7 +27,6 @@ void remover_ListaCircular(int id_processo)
     }
 }
 
-
 void add_ListaCircular(PCB processo)
 {
     lock_guard<mutex> lock(mutexListaCircular);
@@ -67,7 +66,7 @@ void *FCFS(void *arg)
     return nullptr;
 }
 
-void *First_Job_First(void *arg)
+void *First_Remain_Job_First(void *arg)
 {
     (void)arg;
 
@@ -130,34 +129,27 @@ int obterProximoProcesso()
     return idProcesso;
 }
 
-
-int iniciando_SO(pthread_t &thread_SO)
+int iniciando_SO(pthread_t &thread_SO, int op)
 {   
     gerarLista();
+    using namespace std::chrono;
+
+    // Marca o início do tempo
     for (const auto &so : listaCircular_SO_2)
     {
         std::cout << "ID: " << so.id_processo
                   << ", Ciclo de Vida: " << so.ciclo_de_vida
                   << ", Prioridade: " << so.prioridade << std::endl;
     }
-    
-
-    int op;
-    cout <<  "\n\n\t ----------{Escolha a Politica de Escalanomento}---------- "<< endl;
-    cout <<  "\n\t\t [1] = FCFS.";
-    cout <<  "\n\t\t [2] = Shortest Job First";
-    cout <<  "\n\t\t [3] = Prioridade";
-    cout <<  "\n\t\t [>] = ";
-    cin>>op;
-    cout <<  "\n\n\t --------------------------------------------------------- "<< endl;
 
     int ret =0;
     switch (op){
         case 1:
             ret = pthread_create(&thread_SO, nullptr, FCFS, nullptr);
             break;
+         
         case 2:
-            ret = pthread_create(&thread_SO, nullptr, First_Job_First, nullptr);
+            ret = pthread_create(&thread_SO, nullptr, First_Remain_Job_First, nullptr);
             break;
         case 3:
             ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
@@ -172,9 +164,6 @@ int iniciando_SO(pthread_t &thread_SO)
         cerr << "Erro ao criar a thread do SO!" << endl;
         return 1;
     }
-
-   // cout << " \n\t - Lista dos jobs carregados:  " << endl << endl;
-   // imprimirListaCircular();
 
     return 0;
 }

@@ -134,7 +134,6 @@ void *processarProcesso(void *arg)
     pthread_exit(nullptr);
 }
 
-
 // Função que busca o processo na memória
 bool buscarProcessoNaMemoria(int idProcesso, Page &paginaAtual, PCB &processoAtual)
 {
@@ -167,6 +166,7 @@ string obterEstadoProcesso(const PCB &processo)
     return "EXECUTANDO";
 }
 
+//
 void *monitorQuantum(void *args) {
     ThreadArgs* threadArgs = static_cast<ThreadArgs*>(args);
 

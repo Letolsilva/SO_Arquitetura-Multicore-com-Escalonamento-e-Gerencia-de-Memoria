@@ -37,13 +37,8 @@ void *monitorarEstados(void *)
     pthread_exit(nullptr);
 }
 
-
-
 void* start(void* arg){
-    string diretorio = "data";
-    vector<int>* processosNaMemoria = static_cast<vector<int>*>(arg);
-    (void)processosNaMemoria;
-    
+    int op = *static_cast<int*>(arg); // Desreferencia o ponteiro para obter o valor de op
     // ---------------- Bootloader ------------------//
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
@@ -74,10 +69,10 @@ void* start(void* arg){
     cout << "Arquivo output.data inicializado com sucesso." << endl;
     arquivo.close();
 
-    int status_memoria = povoando_Memoria(thread_memoria, diretorio);
+    int status_memoria = povoando_Memoria(thread_memoria, op);
     pthread_join(thread_memoria, nullptr);
 
-    int status_so = iniciando_SO(thread_so);
+    int status_so = iniciando_SO(thread_so,op);
 
    // pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
 
