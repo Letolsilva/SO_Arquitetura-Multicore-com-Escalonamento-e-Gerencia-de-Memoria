@@ -65,6 +65,7 @@ void *processarProcesso(void *arg)
         }
 
         if(processoAtual.estado != BLOQUEADO){
+            lock_guard<mutex> lock(mutexProcessos);
             processoAtual.timestamp_inicial = timestamp_inicial;
             for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
             {
@@ -78,7 +79,7 @@ void *processarProcesso(void *arg)
         }
 
         if(processoAtual.quantum == 0 && processoAtual.estado == BLOQUEADO){
-
+            lock_guard<mutex> lock(mutexProcessos);
             random_device rd;
             mt19937 gen(rd());
             uniform_int_distribution<> dist(0, 20);
