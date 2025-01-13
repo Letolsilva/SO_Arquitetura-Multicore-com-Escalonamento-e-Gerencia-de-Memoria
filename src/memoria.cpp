@@ -48,7 +48,8 @@ void imprimirMemoria()
     cout << "=========================================" << endl;
 }
 
-void salvarNaMemoria(PCB *processo){
+void salvarNaMemoria(PCB *processo)
+{
 
     lock_guard<mutex> lock(mutexMemoria);
     {
@@ -57,28 +58,26 @@ void salvarNaMemoria(PCB *processo){
             if (it->pcb.id == processo->id)
             {
                 it->pcb.registradores = processo->registradores;
-                if(static_cast<int>(processo->historico_quantum.size())!= 0){
+                if (static_cast<int>(processo->historico_quantum.size()) != 0)
+                {
                     it->pcb.historico_quantum = processo->historico_quantum;
-
                 }
                 it->pcb.resultado = processo->resultado;
                 it->pcb.quantum = processo->quantum;
                 it->pcb.estado = processo->estado;
                 it->pcb.pc = processo->pc;
-                
+
                 break;
             }
         }
-
     }
-   
 }
 
 void carregarProcessosNaMemoria(int op)
 {
     int idAtual = 1;
     int baseAtual = 0, limiteAtual = 1;
-    //int* op_ptr = new int(op);
+    // int* op_ptr = new int(op);
 
     string linha, instrucao;
     string diretorio = "data";
@@ -86,10 +85,7 @@ void carregarProcessosNaMemoria(int op)
 
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> dist(0, 20);
-
-            cout << "\t\t\t---- Opcaoooooo="<< op << "---> "<< endl;
-
+    uniform_int_distribution<> dist(20, 50);
 
     for (const auto &entry : fs::directory_iterator(diretorio))
     {
@@ -98,8 +94,8 @@ void carregarProcessosNaMemoria(int op)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
-            pcb.quantum = 8;
-            //pcb.quantum = dist(gen);
+            // pcb.quantum = 5;
+            pcb.quantum = dist(gen);
             pcb.historico_quantum.push_back(pcb.quantum);
             pcb.timestamp = CLOCK;
             pcb.estado = PRONTO;
@@ -112,12 +108,12 @@ void carregarProcessosNaMemoria(int op)
 
             ifstream arquivo(pcb.nomeArquivo);
 
-            
             while (getline(arquivo, linha))
             {
                 pcb.instrucoes.push_back(linha);
 
-                if(op==2){
+                if (op == 2)
+                {
                     stringstream ss(linha);
                     ss >> instrucao >> info1 >> info2 >> info3;
 
@@ -136,15 +132,13 @@ void carregarProcessosNaMemoria(int op)
                         int tempoAdicional = (info3 - 1) + temposExecucao["@"];
                         pcb.ciclo_de_vida += tempoAdicional;
                     }
-                }else
+                }
+                else
                 {
                     pcb.ciclo_de_vida = 0;
-
                 }
             }
-            
 
-        
             arquivo.close();
 
             Page nova_pagina_memoria;
@@ -153,8 +147,8 @@ void carregarProcessosNaMemoria(int op)
             nova_pagina_memoria.pcb = pcb;
 
             memoryPages.push_back(nova_pagina_memoria);
-           // atualizarListaCircular(pcb.id);
-            //atualizarListaCircular_2(pcb);
+            // atualizarListaCircular(pcb.id);
+            // atualizarListaCircular_2(pcb);
         }
     }
 }
@@ -162,14 +156,13 @@ void carregarProcessosNaMemoria(int op)
 void *threadCarregarProcessos(void *arg)
 {
     int op = *static_cast<int *>(arg);
-    cout << "Recebido valor de op: " << op << endl;
     carregarProcessosNaMemoria(op);
     return nullptr;
 }
 
 int povoando_Memoria(pthread_t &thread_memoria, int op)
 {
-    int* op_thread = new int(op);
+    int *op_thread = new int(op);
 
     // Thread_Memoria = Carregar todos os processos, paginando na memoria, lendo os inputs e colocando em wait, e o ret é apenas para verificação...
     int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, op_thread);

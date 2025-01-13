@@ -14,8 +14,6 @@ void atualizarEstadoProcesso(int idProcesso, const string &novoEstado)
         lock_guard<mutex> lock(mutexListaCircular);
         estadosProcessos[idProcesso] = novoEstado;
     }
-    // Log da alteração
-    // cout << "[DEBUG] Processo ID=" << idProcesso << " mudou para " << novoEstado << endl;
 }
 
 void *monitorarEstados(void *)

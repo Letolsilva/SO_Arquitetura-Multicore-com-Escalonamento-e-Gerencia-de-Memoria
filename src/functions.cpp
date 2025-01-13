@@ -84,9 +84,15 @@ void *processarProcesso(void *arg)
             lock_guard<mutex> lock(mutexProcessos);
             random_device rd;
             mt19937 gen(rd());
-            uniform_int_distribution<> dist(0, 20);
-            // processoAtual.quantum = dist(gen);
-            processoAtual.quantum = 15;
+            uniform_int_distribution<> dist(20, 50);
+            processoAtual.quantum = dist(gen);
+            // processoAtual.quantum = 5;
+            if (processoAtual.prioridade != 0)
+            {
+                cout << "PRIORIDADEEE";
+                processoAtual.prioridade--;
+            }
+
             cout << "\n\t tava bloqueado: " << processoAtual.id << "novo quantum= " << processoAtual.quantum << endl;
             processoAtual.historico_quantum.push_back(processoAtual.quantum);
             processoAtual.estado = PRONTO;
@@ -106,7 +112,6 @@ void *processarProcesso(void *arg)
 
         var += abs(quantumInicial - processoAtual.quantum);
         processoAtual.timestamp += var;
-        // cout << "\t timestamp: " << processoAtual.timestamp << endl;
 
         if (processoAtual.estado == TERMINADO)
         {
@@ -167,8 +172,9 @@ string obterEstadoProcesso(const PCB &processo)
 }
 
 //
-void *monitorQuantum(void *args) {
-    ThreadArgs* threadArgs = static_cast<ThreadArgs*>(args);
+void *monitorQuantum(void *args)
+{
+    ThreadArgs *threadArgs = static_cast<ThreadArgs *>(args);
 
     // Acessar os argumentos
     PCB *processoAtual = threadArgs->processoAtual;
