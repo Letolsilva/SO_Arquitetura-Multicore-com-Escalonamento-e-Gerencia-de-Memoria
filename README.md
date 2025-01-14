@@ -20,6 +20,7 @@ Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore com
 
 ## Escalonador
 Foram implementados três escalonadores: First Come, First Served (FCFS), Shortest Job Next (SJRN) e Escalonamento por Prioridade. Lembre-se de escolher o escalonador que deseja executar no terminal, utilizando os números 1, 2 ou 3.
+
 ![image](https://github.com/user-attachments/assets/6722b861-7fca-47ab-9294-192a31ffffdc)
    
 ## Arquivos de entrada e saída
