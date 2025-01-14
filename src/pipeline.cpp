@@ -75,12 +75,14 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
         quantum--;
         CLOCK++;
         MemoryAccess(resultado, registradores, info1, quantum, processoAtual);
-        
-    
-
+    }
+    else if(instrucao == '&'){
+        int resultado = registradores[info1];
+        MemoryAccess(resultado, registradores, info1, quantum, processoAtual);
     }
     else if (instrucao == '?')
     {
+        bool resposta;
         // cout << registradores[info1] << " " << info4 << " " << registradores[info2] << ": ";
         if (info4 == "<")
         {
@@ -91,6 +93,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     return;
                 } 
                 // cout << "True" << endl;
+                resposta = true;
                 quantum--;
                 CLOCK++;
             }
@@ -101,6 +104,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     return;
                 } 
                 // cout << "False" << endl;
+                resposta = false;
                 quantum--;
                 CLOCK++;
             }
@@ -114,6 +118,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     return;
                 } 
                 // cout << "True" << endl;
+                resposta = true;
                 quantum--;
                 CLOCK++;
             }
@@ -123,6 +128,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     processoAtual.estado = BLOQUEADO;
                     return;
                 } 
+                resposta = false;
                 // cout << "False" << endl;
                 quantum--;
                 CLOCK++;
@@ -137,6 +143,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     return;
                 } 
                 // cout << "True" << endl;
+                resposta = true;
                 quantum--;
                 CLOCK++;
             }
@@ -147,6 +154,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     return;
                 } 
                 // cout << "False" << endl;
+                resposta = false;
                 quantum--;
                 CLOCK++;
 
@@ -160,7 +168,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     processoAtual.estado = BLOQUEADO;
                     return;
                 } 
-                // cout << "True" << endl;
+                resposta = true;
                 quantum--;
                 CLOCK++;
             }
@@ -170,11 +178,13 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     processoAtual.estado = BLOQUEADO;
                     return;
                 } 
-                // cout << "False" << endl;
+
+                resposta = false;
                 quantum--;
                 CLOCK++;
             }
         }
+        MemoryAccess(resposta, registradores, info1, quantum, processoAtual);
     }
 }
 
