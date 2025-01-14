@@ -48,6 +48,16 @@ void imprimirMemoria()
     cout << "=========================================" << endl;
 }
 
+int getTempoExecucao(const string& chave) {
+    auto it = temposExecucao.find(chave);
+    if (it != temposExecucao.end()) {
+        return it->second; // Retorna o valor associado à chave
+    } else {
+        cerr << "Erro: chave \"" << chave << "\" não encontrada no mapa." << endl;
+        return -1; // Código de erro
+    }
+}
+
 void salvarNaMemoria(PCB *processo)
 {
 
@@ -58,6 +68,7 @@ void salvarNaMemoria(PCB *processo)
             if (it->pcb.id == processo->id)
             {
                 it->pcb.registradores = processo->registradores;
+                it->pcb.ciclo_de_vida = processo->ciclo_de_vida;
                 if (static_cast<int>(processo->historico_quantum.size()) != 0)
                 {
                     it->pcb.historico_quantum = processo->historico_quantum;
@@ -94,7 +105,6 @@ void carregarProcessosNaMemoria(int op)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
-            // pcb.quantum = 5;
             pcb.quantum = dist(gen);
             pcb.historico_quantum.push_back(pcb.quantum);
             pcb.timestamp = CLOCK;

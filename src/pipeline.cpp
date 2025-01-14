@@ -228,6 +228,7 @@ void InstructionFetch(int *registradores, string linha, int &quantum, PCB &proce
     InstructionDecode(instrucao, info1, info2, info3, info4, registradores, quantum, processoAtual);
 
     if(processoAtual.estado != BLOQUEADO){
+        
         PC++;
         processoAtual.pc++;
     

@@ -175,6 +175,8 @@ string obterEstadoProcesso(const PCB &processo)
 void *monitorQuantum(void *args)
 {
     ThreadArgs *threadArgs = static_cast<ThreadArgs *>(args);
+    string linha;
+    char instrucao;
 
     // Acessar os argumentos
     PCB *processoAtual = threadArgs->processoAtual;
@@ -191,6 +193,13 @@ void *monitorQuantum(void *args)
     while (processoAtual->quantum > 0 && processoAtual->estado != BLOQUEADO && static_cast<int>(processoAtual->instrucoes.size()) > processoAtual->pc)
     {
         UnidadeControle(processoAtual->registradores.data(), processoAtual->instrucoes[processoAtual->pc], processoAtual->quantum, *processoAtual);
+
+        int x = processoAtual->pc - 1;
+        linha =  processoAtual->instrucoes[x];
+        stringstream ss(linha);
+        ss >> instrucao;
+        x = getTempoExecucao(string(1, instrucao));
+        processoAtual->ciclo_de_vida = processoAtual->ciclo_de_vida - x;
     }
 
     // Aqui faz a verificacao do job está bloqueado para colocar na lista novamente
