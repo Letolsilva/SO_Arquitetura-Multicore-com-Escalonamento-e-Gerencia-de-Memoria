@@ -39,7 +39,8 @@ Foram implementados três escalonadores: First Come, First Served (FCFS), Shorte
 O arquivo de saída é armazenado no diretório **output** após a execução do escalonamento Shortest Remaining Job First. Certifique-se de que a pasta **output** tenha sido criada para que o arquivo de saída possa ser gerado. O comando `make` já cria essa pasta automaticamente.
 
 
-![image](https://github.com/user-attachments/assets/d3bc5b10-8b10-4839-b53a-68a113e20e88)
+![image](https://github.com/user-attachments/assets/c31b57ab-e689-466f-872a-23f013533521)
+
 
 
 
