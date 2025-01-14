@@ -2,9 +2,10 @@
 #define MEMORIA_HPP
 #include "include.hpp"
 
-void carregarProcessosNaMemoria(const string &diretorio);
+void carregarProcessosNaMemoria(int op);
+void salvarNaMemoria(PCB *processo);
 void *threadCarregarProcessos(void *arg);
-int povoando_Memoria(pthread_t &thread_memoria, string diretorio);
+int povoando_Memoria(pthread_t &thread_memoria, int op);
 void imprimirMemoria();
 
 #endif

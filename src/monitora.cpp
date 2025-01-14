@@ -14,8 +14,6 @@ void atualizarEstadoProcesso(int idProcesso, const string &novoEstado)
         lock_guard<mutex> lock(mutexListaCircular);
         estadosProcessos[idProcesso] = novoEstado;
     }
-    // Log da alteração
-    // cout << "[DEBUG] Processo ID=" << idProcesso << " mudou para " << novoEstado << endl;
 }
 
 void *monitorarEstados(void *)
@@ -28,6 +26,7 @@ void *monitorarEstados(void *)
             {
                 if(estado == "BLOQUEADO"){
                     cout << " Processo ID =  "<< id << "- BLOQUEADO" << endl;
+                    usleep(1000000); // Pausa por 1 segundo
                 }
             }
         }
@@ -36,32 +35,44 @@ void *monitorarEstados(void *)
     pthread_exit(nullptr);
 }
 
-
-
 void* start(void* arg){
-    string diretorio = "data";
-    vector<int>* processosNaMemoria = static_cast<vector<int>*>(arg);
-
+    int op = *static_cast<int*>(arg); // Desreferencia o ponteiro para obter o valor de op
     // ---------------- Bootloader ------------------//
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     pthread_t thread_cpu[NUM_CORE];
-    pthread_t threadMonitor ={};
+   // pthread_t threadMonitor ={};
     // ----------------------------------------------//
 
-    ofstream arquivo("./output/output.data", ios::trunc);
+    // Caminho para o diretório e arquivo
+    const string diretorio_saida = "./output";
+    const string arquivoPath = diretorio_saida + "/output.data";
+
+    // Verifica se o diretório existe, se não, cria o diretório
+    if (!fs::exists(diretorio_saida)) {
+        try {
+            fs::create_directories(diretorio_saida);
+            cout << "Diretório 'output' criado com sucesso." << endl;
+        } catch (const fs::filesystem_error& e) {
+            cerr << "Erro ao criar o diretório 'output': " << e.what() << endl;
+        }
+    }
+
+    // Inicializa o arquivo
+    ofstream arquivo(arquivoPath, ios::trunc);
     if (!arquivo.is_open()) {
         cerr << "Erro ao inicializar o arquivo output.data!" << endl;
-        return nullptr;  // Retorno seguro sem erro
     }
+
+    cout << "Arquivo output.data inicializado com sucesso." << endl;
     arquivo.close();
 
-    int status_memoria = povoando_Memoria(thread_memoria, diretorio);
+    int status_memoria = povoando_Memoria(thread_memoria, op);
     pthread_join(thread_memoria, nullptr);
 
-    int status_so = iniciando_SO(thread_so, *processosNaMemoria);
+    int status_so = iniciando_SO(thread_so,op);
 
-    pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
+   // pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
 
     if (status_memoria == 0 && status_so == 0) {
         for (int i = 0; i < NUM_CORE; ++i) {
@@ -76,11 +87,14 @@ void* start(void* arg){
         for (int i = 0; i < NUM_CORE; ++i) {
             pthread_join(thread_cpu[i], nullptr);
         }
+
+        imprimirListaCircular();
+
+        pthread_join(thread_so, nullptr);
+        monitorando = false;
+        //  pthread_join(threadMonitor, nullptr);
     }
 
-    pthread_join(thread_so, nullptr);
-    monitorando = false;
-    pthread_join(threadMonitor, nullptr);
 
     return nullptr;  // Indica que a thread terminou
 }

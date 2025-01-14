@@ -11,13 +11,14 @@
 #include <filesystem>
 #include <pthread.h>
 #include <mutex>
+#include <chrono>
 #include <semaphore.h>
 #include <sched.h>
 #include <random>
 #include <algorithm>
 
 #define NUM_PERIFERICOS 5
-#define NUM_CORE 3
+#define NUM_CORE 2
 
 using namespace std;
 namespace fs = filesystem;
@@ -26,7 +27,8 @@ enum EstadoProcesso
 {
     PRONTO,
     BLOQUEADO,
-    EXECUTANDO
+    EXECUTANDO, 
+    TERMINADO
 };
 
 extern int PC;
@@ -44,14 +46,18 @@ struct PCB
     int id;          // ID do processo
     int quantum;     // Quantum inicial
     int timestamp;   // Timestamp inicial
+    int timestamp_inicial;
     int prioridade;  // Prioridade do processo
     int baseMemoria;            // Endereço base de memória
     int limiteMemoria;
     int resultado;             // Limite de alocação de memória
+    int ciclo_de_vida;
+    int pc;
     vector<int> registradores; // Banco de registradores
     EstadoProcesso estado;     // Estado atual do processo
     string nomeArquivo;        // Nome do arquivo associado
     vector<string> instrucoes; // Instruções do processo
+    vector<int> historico_quantum;
 };
 
 struct Page
@@ -62,24 +68,33 @@ struct Page
     pthread_t thread; // Thread associada ao processo
 };
 
-// struct ThreadArgs {
-//     pthread_t thread_memoria;
-//     pthread_t thread_so;
-//     pthread_t *thread_cpu;
-//     vector<int> processosNaMemoria;
-// };
+struct SO
+{
+    int id_processo;
+    int ciclo_de_vida;
+    int prioridade;
+};
 
 //----Memoria
 extern vector<Page> memoryPages;
 extern int currentPageIndex;
 extern vector<PCB> memoria;  //?
-extern mutex mutexProcessos; //?
+extern mutex mutexProcessos;
+extern mutex mutexMemoria;
+extern mutex output;
 
 //----SO
 extern vector<int> listaCircular_SO;
+extern vector<SO> listaCircular_SO_2;
 extern size_t indiceAtual;
 extern mutex mutexListaCircular;
-extern unordered_map<int, string> estadosProcessos; // Mapeia o ID do processo para seu estado
+extern unordered_map<int, string> estadosProcessos; 
 
+//----Hash para tempos de execução das operações (para SJF)
+extern unordered_map<string, int> temposExecucao ;
+
+struct ThreadArgs {
+    PCB* processoAtual;
+};
 
 #endif

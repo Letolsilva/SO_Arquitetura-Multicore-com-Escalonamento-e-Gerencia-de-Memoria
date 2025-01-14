@@ -2,6 +2,19 @@
 #include "SO.hpp"
 #include "functions.hpp"
 
+mutex mutexMemoria;
+
+unordered_map<string, int> temposExecucao = {
+    {"+", 5}, // Soma
+    {"*", 5}, // Multiplicação
+    {"-", 5}, // Subtração
+    {"/", 5}, // Divisão
+    {"=", 2}, // Igual
+    {"&", 2}, // Leitura
+    {"?", 3}, // Condicional (<, >, =, !=)
+    {"@", 5}  // Loop (o cálculo de tempo adicional depende de (info3 - 1) e será feito dinamicamente)
+};
+
 void imprimirMemoria()
 {
     cout << "========== Conteúdo da Memória ==========" << endl;
@@ -35,10 +48,40 @@ void imprimirMemoria()
     cout << "=========================================" << endl;
 }
 
-void carregarProcessosNaMemoria(const string &diretorio)
+void salvarNaMemoria(PCB *processo)
+{
+
+    lock_guard<mutex> lock(mutexMemoria);
+    {
+        for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
+        {
+            if (it->pcb.id == processo->id)
+            {
+                it->pcb.registradores = processo->registradores;
+                if (static_cast<int>(processo->historico_quantum.size()) != 0)
+                {
+                    it->pcb.historico_quantum = processo->historico_quantum;
+                }
+                it->pcb.resultado = processo->resultado;
+                it->pcb.quantum = processo->quantum;
+                it->pcb.estado = processo->estado;
+                it->pcb.pc = processo->pc;
+
+                break;
+            }
+        }
+    }
+}
+
+void carregarProcessosNaMemoria(int op)
 {
     int idAtual = 1;
     int baseAtual = 0, limiteAtual = 1;
+    // int* op_ptr = new int(op);
+
+    string linha, instrucao;
+    string diretorio = "data";
+    int info1, info2, info3;
 
     random_device rd;
     mt19937 gen(rd());
@@ -51,20 +94,51 @@ void carregarProcessosNaMemoria(const string &diretorio)
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
+            // pcb.quantum = 5;
             pcb.quantum = dist(gen);
+            pcb.historico_quantum.push_back(pcb.quantum);
             pcb.timestamp = CLOCK;
             pcb.estado = PRONTO;
             pcb.baseMemoria = baseAtual++;
+            pcb.pc = 0;
+            pcb.ciclo_de_vida = 0;
             pcb.limiteMemoria = limiteAtual++;
-            pcb.prioridade = dist(gen) % 10; // Define prioridade aleatória
+            pcb.prioridade = dist(gen) % 10;
             pcb.registradores.resize(8, 0);
 
             ifstream arquivo(pcb.nomeArquivo);
-            string linha;
+
             while (getline(arquivo, linha))
             {
                 pcb.instrucoes.push_back(linha);
+
+                if (op == 2)
+                {
+                    stringstream ss(linha);
+                    ss >> instrucao >> info1 >> info2 >> info3;
+
+                    auto it = temposExecucao.find(instrucao);
+                    if (it != temposExecucao.end())
+                    {
+                        pcb.ciclo_de_vida += it->second;
+                    }
+                    else
+                    {
+                        cout << "Instrucao: " << instrucao << " não encontrada no map." << endl;
+                    }
+
+                    if (instrucao == "@")
+                    {
+                        int tempoAdicional = (info3 - 1) + temposExecucao["@"];
+                        pcb.ciclo_de_vida += tempoAdicional;
+                    }
+                }
+                else
+                {
+                    pcb.ciclo_de_vida = 0;
+                }
             }
+
             arquivo.close();
 
             Page nova_pagina_memoria;
@@ -73,23 +147,25 @@ void carregarProcessosNaMemoria(const string &diretorio)
             nova_pagina_memoria.pcb = pcb;
 
             memoryPages.push_back(nova_pagina_memoria);
-            atualizarListaCircular(pcb.id);
+            // atualizarListaCircular(pcb.id);
+            // atualizarListaCircular_2(pcb);
         }
     }
 }
 
 void *threadCarregarProcessos(void *arg)
 {
-    string diretorio = *static_cast<string *>(arg);
-    carregarProcessosNaMemoria(diretorio);
+    int op = *static_cast<int *>(arg);
+    carregarProcessosNaMemoria(op);
     return nullptr;
 }
 
-int povoando_Memoria(pthread_t &thread_memoria, string diretorio)
+int povoando_Memoria(pthread_t &thread_memoria, int op)
 {
+    int *op_thread = new int(op);
 
     // Thread_Memoria = Carregar todos os processos, paginando na memoria, lendo os inputs e colocando em wait, e o ret é apenas para verificação...
-    int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, &diretorio);
+    int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, op_thread);
 
     if (ret != 0)
     {

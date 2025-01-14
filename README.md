@@ -1,4 +1,4 @@
-<h1 align="center" font-size="200em"><b>Simulador da Arquitetura Multicore de Von Neumann com Suporte a Preempção</b></h1>
+<h1 align="center" font-size="200em"><b>Simulador da Arquitetura Multicore de Von Neumann com Suporte a Preempção e Escalonador</b></h1>
 
 <div align = "center" >
 <!-- imagem -->
@@ -9,16 +9,20 @@
 
 </div>
 
-## Abstração da Arquitetura Multicore
+## Abstração da Arquitetura com escalonador de Processos
 
-Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore, em conjunto com a CPU, o sistema operacional e a memória.
+Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore com escalonadores, em conjunto com a CPU, o sistema operacional e a memória.
 
-![Diagrama da CPU](./imgs/diagramaMulticore.jpeg)
-    <p>
-        Acesse o  <a href="https://www.overleaf.com/read/jygddzvfxprd#bbeb2d" target="_blank" rel="noopener noreferrer">
-        Artigo
-    </a> com toda a documentação clicando no link.
-    </p>
+![image](https://github.com/user-attachments/assets/068cfb1c-d1f2-4cdb-81c8-ebd34d1bd994)
+<div> 
+    Acesse o <a href="https://www.overleaf.com/read/jygddzvfxprd#bbeb2d" target="_blank" rel="noopener noreferrer">Artigo</a> com toda a documentação clicando no link.
+</div>
+
+## Escalonador
+Foram implementados três escalonadores: First Come, First Served (FCFS), Shortest Job Next (SJRN) e Escalonamento por Prioridade. Lembre-se de escolher o escalonador que deseja executar no terminal, utilizando os números 1, 2 ou 3.
+
+![image](https://github.com/user-attachments/assets/6722b861-7fca-47ab-9294-192a31ffffdc)
+   
 ## Arquivos de entrada e saída
 
 ### Input 
@@ -26,15 +30,17 @@ Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore, em
 **Observação:** Os arquivos de input devem obrigatoriamente estar no formato **.data**.  
 É possível alterar essa configuração no código antes da execução. Certifique-se de armazená-los na pasta **data**.
 
+![image](https://github.com/user-attachments/assets/2c4ebfbc-8dfe-48d7-86f8-203b16c8ec9b)
 
-![image](https://github.com/user-attachments/assets/04db3269-4307-45f1-90e6-526c314faadd)
 
 
 ### Output
 
-O arquivo de saída sera armazenado na pasta **output**.
+O arquivo de saída é armazenado no diretório **output** após a execução do escalonamento Shortest Remaining Job First. Certifique-se de que a pasta **output** tenha sido criada para que o arquivo de saída possa ser gerado. O comando `make` já cria essa pasta automaticamente.
 
-![Exemplo de Output](./imgs/output3.png)
+
+![image](https://github.com/user-attachments/assets/d3bc5b10-8b10-4839-b53a-68a113e20e88)
+
 
 
 ## 👾Compilação e execução
@@ -43,11 +49,11 @@ O arquivo de saída sera armazenado na pasta **output**.
   - Processador Intel Core i7, 12th Gen;
   - Sistema Operacional Ubuntu 22.04.5;
   - 16GB de RAM.
-- | Comando      | Função                                                                                  |
-  | ------------ | --------------------------------------------------------------------------------------- |
-  | `make clean` | Apaga a última compilação realizada contida na pasta build                              |
-  | `make`       | Executa a compilação do programa utilizando o gcc, e o resultado vai para a pasta build |
-  | `make run`   | Executa o programa da pasta build após a realização da compilação                       |
+- | Comando      | Função                                                                                                                          |
+  | ------------ | ---------------------------------------------------------------------------------------                                         |
+  | `make clean` | Apaga a última compilação realizada contida na pasta build e o arquivo output                                                   |
+  | `make`       | Executa a compilação do programa utilizando o gcc, e o resultado vai para a pasta build e cria uma pasta output caso nao exista |
+  | `make run`   | Executa o programa da pasta build após a realização da compilação                                                               |
    
 ## Contato
 
