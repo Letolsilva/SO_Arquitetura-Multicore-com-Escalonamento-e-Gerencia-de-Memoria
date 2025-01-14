@@ -14,9 +14,9 @@
 Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore com escalonadores, em conjunto com a CPU, o sistema operacional e a memória.
 
 ![image](https://github.com/user-attachments/assets/068cfb1c-d1f2-4cdb-81c8-ebd34d1bd994)
-<div> 
+<!-- <div> 
     Acesse o <a href="https://www.overleaf.com/read/jygddzvfxprd#bbeb2d" target="_blank" rel="noopener noreferrer">Artigo</a> com toda a documentação clicando no link.
-</div>
+</div> -->
 
 ## Escalonador
 Foram implementados três escalonadores: First Come, First Served (FCFS), Shortest Job Next (SJRN) e Escalonamento por Prioridade. Lembre-se de escolher o escalonador que deseja executar no terminal, utilizando os números 1, 2 ou 3.
