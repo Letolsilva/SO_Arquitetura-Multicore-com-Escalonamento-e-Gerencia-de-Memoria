@@ -10,20 +10,20 @@ mutex mutexListaCircular;
 void remover_ListaCircular(int id_processo)
 {
     lock_guard<mutex> lock(mutexListaCircular);
-    
+
     auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
-            [id_processo](const SO& so) { return so.id_processo == id_processo; });
-    
+                      [id_processo](const SO &so)
+                      { return so.id_processo == id_processo; });
+
     if (it != listaCircular_SO_2.end())
     {
         // Remove o processo encontrado
         listaCircular_SO_2.erase(it);
-        cout << "Processo removido da lista: " << id_processo << endl;
     }
     else
     {
         // Caso o processo não esteja na lista
-        cout << "Processo não encontrado na lista: " << id_processo << endl;
+        // cout << "Processo não encontrado na lista: " << id_processo << endl;
     }
 }
 
@@ -34,13 +34,12 @@ void add_ListaCircular(PCB processo)
     auto it = find(listaCircular_SO.begin(), listaCircular_SO.end(), processo.id);
     if (it == listaCircular_SO.end())
     {
-        cout << " ADD : " << processo.id;
         SO aux_job;
         aux_job.id_processo = processo.id;
         aux_job.ciclo_de_vida = processo.ciclo_de_vida;
         aux_job.prioridade = processo.prioridade;
         listaCircular_SO_2.push_back(aux_job); // Adiciona apenas se não existir
-        //estadosProcessos[idProcesso] = "PRONTO";
+        // estadosProcessos[idProcesso] = "PRONTO";
     }
     else
     {
@@ -48,7 +47,8 @@ void add_ListaCircular(PCB processo)
     }
 }
 
-void gerarLista(){
+void gerarLista()
+{
 
     for (const Page &pag : memoryPages)
     {
@@ -60,9 +60,10 @@ void *FCFS(void *arg)
 {
     (void)arg;
 
-    while(!listaCircular_SO_2.empty()){
+    while (!listaCircular_SO_2.empty())
+    {
     }
-    
+
     return nullptr;
 }
 
@@ -70,13 +71,13 @@ void *First_Remain_Job_First(void *arg)
 {
     (void)arg;
 
-    while(!listaCircular_SO_2.empty()){
+    while (!listaCircular_SO_2.empty())
+    {
         lock_guard<mutex> lock(mutexListaCircular);
-        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b) {
-            return a.ciclo_de_vida < b.ciclo_de_vida;
-        });
+        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b)
+             { return a.ciclo_de_vida < b.ciclo_de_vida; });
     }
-    
+
     return nullptr;
 }
 
@@ -84,26 +85,20 @@ void *Prioridade(void *arg)
 {
     (void)arg;
 
-    while(!listaCircular_SO_2.empty()){
+    while (!listaCircular_SO_2.empty())
+    {
         lock_guard<mutex> lock(mutexListaCircular);
-        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b) {
-            return a.prioridade > b.prioridade;
-        });
+        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b)
+             { return a.prioridade > b.prioridade; });
     }
-    
+
     return nullptr;
 }
 
 int obterProximoProcesso()
 {
     lock_guard<mutex> lock(mutexListaCircular);
-    for (const auto &so : listaCircular_SO_2)
-    {
 
-    cout << "ID: " << so.id_processo
-                  << ", Ciclo de Vida: " << so.ciclo_de_vida
-                  << ", Prioridade: " << so.prioridade << endl;
-    }
     if (listaCircular_SO_2.empty())
     {
         return -1;
@@ -114,7 +109,6 @@ int obterProximoProcesso()
 
     // Remove o processo atual da lista
     listaCircular_SO_2.erase(listaCircular_SO_2.begin() + indiceAtual);
-    cout << "\n\t ----{Removi:  " << idProcesso << endl;
 
     // Ajusta o índice atual
     if (listaCircular_SO_2.empty())
@@ -129,34 +123,34 @@ int obterProximoProcesso()
     return idProcesso;
 }
 
-int iniciando_SO(pthread_t &thread_SO, int op)
-{   
+int iniciando_SO(pthread_t &thread_SO)
+{
     gerarLista();
     using namespace std::chrono;
 
-    // Marca o início do tempo
-    for (const auto &so : listaCircular_SO_2)
-    {
-        std::cout << "ID: " << so.id_processo
-                  << ", Ciclo de Vida: " << so.ciclo_de_vida
-                  << ", Prioridade: " << so.prioridade << std::endl;
-    }
+    // for (const auto &so : listaCircular_SO_2)
+    // {
+    //     std::cout << "ID: " << so.id_processo
+    //               << ", Ciclo de Vida: " << so.ciclo_de_vida
+    //               << ", Prioridade: " << so.prioridade << std::endl;
+    // }
 
-    int ret =0;
-    switch (op){
-        case 1:
-            ret = pthread_create(&thread_SO, nullptr, FCFS, nullptr);
-            break;
-         
-        case 2:
-            ret = pthread_create(&thread_SO, nullptr, First_Remain_Job_First, nullptr);
-            break;
-        case 3:
-            ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
-            break;
-        default:
-            return 1;
-            break;
+    int ret = 0;
+    switch (op)
+    {
+    case 1:
+        ret = pthread_create(&thread_SO, nullptr, FCFS, nullptr);
+        break;
+
+    case 2:
+        ret = pthread_create(&thread_SO, nullptr, First_Remain_Job_First, nullptr);
+        break;
+    case 3:
+        ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
+        break;
+    default:
+        return 1;
+        break;
     }
 
     if (ret != 0)
@@ -171,7 +165,6 @@ int iniciando_SO(pthread_t &thread_SO, int op)
 void imprimirProcessosEsperando()
 {
     lock_guard<mutex> lock(mutexListaCircular);
-    cout << "Processos esperando:" << endl;
     for (int id : listaCircular_SO)
     {
         cout << "Processo ID: " << id << endl;
@@ -183,7 +176,7 @@ void imprimirListaCircular()
     lock_guard<mutex> lock(mutexListaCircular);
     if (listaCircular_SO_2.empty())
     {
-        cout << "A lista circular está vazia." << endl;
+
         return;
     }
 

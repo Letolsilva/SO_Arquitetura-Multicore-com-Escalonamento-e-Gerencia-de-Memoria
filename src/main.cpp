@@ -6,6 +6,7 @@
 
 int PC = 0;
 int CLOCK = 0;
+int op = 0;
 bool perifericos[NUM_PERIFERICOS] = {false};
 vector<int> principal;
 vector<mutex> mutexCores(NUM_CORE);
@@ -16,7 +17,6 @@ int main()
 
     using namespace std::chrono;
 
-    int op;
     cout << "\n\n\t ----------{Escolha a Politica de Escalanomento}---------- " << endl;
     cout << "\n\t\t [1] = FCFS.";
     cout << "\n\t\t [2] = Shortest Remaining Job First";
@@ -25,11 +25,10 @@ int main()
     cin >> op;
     cout << "\n\n\t --------------------------------------------------------- " << endl;
 
-    int *op_thread = new int(op);
 
     auto inicio = high_resolution_clock::now();
     pthread_t monitor = {};
-    int status_monitor = pthread_create(&monitor, nullptr, start, op_thread);
+    int status_monitor = pthread_create(&monitor, nullptr, start, nullptr);
     if (status_monitor != 0)
     {
         cerr << "Erro ao criar a thread do Monitor!" << endl;

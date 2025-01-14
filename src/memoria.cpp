@@ -48,11 +48,15 @@ void imprimirMemoria()
     cout << "=========================================" << endl;
 }
 
-int getTempoExecucao(const string& chave) {
+int getTempoExecucao(const string &chave)
+{
     auto it = temposExecucao.find(chave);
-    if (it != temposExecucao.end()) {
+    if (it != temposExecucao.end())
+    {
         return it->second; // Retorna o valor associado à chave
-    } else {
+    }
+    else
+    {
         cerr << "Erro: chave \"" << chave << "\" não encontrada no mapa." << endl;
         return -1; // Código de erro
     }
@@ -84,11 +88,10 @@ void salvarNaMemoria(PCB *processo)
     }
 }
 
-void carregarProcessosNaMemoria(int op)
+void carregarProcessosNaMemoria()
 {
     int idAtual = 1;
     int baseAtual = 0, limiteAtual = 1;
-    // int* op_ptr = new int(op);
 
     string linha, instrucao;
     string diretorio = "data";
@@ -147,6 +150,7 @@ void carregarProcessosNaMemoria(int op)
                 {
                     pcb.ciclo_de_vida = 0;
                 }
+                pcb.ciclo_de_vida_inicial = pcb.ciclo_de_vida;
             }
 
             arquivo.close();
@@ -157,25 +161,22 @@ void carregarProcessosNaMemoria(int op)
             nova_pagina_memoria.pcb = pcb;
 
             memoryPages.push_back(nova_pagina_memoria);
-            // atualizarListaCircular(pcb.id);
-            // atualizarListaCircular_2(pcb);
         }
     }
 }
 
 void *threadCarregarProcessos(void *arg)
 {
-    int op = *static_cast<int *>(arg);
-    carregarProcessosNaMemoria(op);
+    (void)arg;
+    carregarProcessosNaMemoria();
     return nullptr;
 }
 
-int povoando_Memoria(pthread_t &thread_memoria, int op)
+int povoando_Memoria(pthread_t &thread_memoria)
 {
-    int *op_thread = new int(op);
 
     // Thread_Memoria = Carregar todos os processos, paginando na memoria, lendo os inputs e colocando em wait, e o ret é apenas para verificação...
-    int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, op_thread);
+    int ret = pthread_create(&thread_memoria, nullptr, threadCarregarProcessos, nullptr);
 
     if (ret != 0)
     {

@@ -89,11 +89,9 @@ void *processarProcesso(void *arg)
             // processoAtual.quantum = 5;
             if (processoAtual.prioridade != 0)
             {
-                cout << "PRIORIDADEEE";
                 processoAtual.prioridade--;
             }
 
-            cout << "\n\t tava bloqueado: " << processoAtual.id << "novo quantum= " << processoAtual.quantum << endl;
             processoAtual.historico_quantum.push_back(processoAtual.quantum);
             processoAtual.estado = PRONTO;
             atualizarEstadoProcesso(processoAtual.id, "PRONTO");
@@ -193,13 +191,15 @@ void *monitorQuantum(void *args)
     while (processoAtual->quantum > 0 && processoAtual->estado != BLOQUEADO && static_cast<int>(processoAtual->instrucoes.size()) > processoAtual->pc)
     {
         UnidadeControle(processoAtual->registradores.data(), processoAtual->instrucoes[processoAtual->pc], processoAtual->quantum, *processoAtual);
-
-        int x = processoAtual->pc - 1;
-        linha =  processoAtual->instrucoes[x];
-        stringstream ss(linha);
-        ss >> instrucao;
-        x = getTempoExecucao(string(1, instrucao));
-        processoAtual->ciclo_de_vida = processoAtual->ciclo_de_vida - x;
+        if (op == 2)
+        {
+            int x = processoAtual->pc - 1;
+            linha = processoAtual->instrucoes[x];
+            stringstream ss(linha);
+            ss >> instrucao;
+            x = getTempoExecucao(string(1, instrucao));
+            processoAtual->ciclo_de_vida = processoAtual->ciclo_de_vida - x;
+        }
     }
 
     // Aqui faz a verificacao do job está bloqueado para colocar na lista novamente
@@ -208,7 +208,6 @@ void *monitorQuantum(void *args)
         lock_guard<mutex> lock(mutexProcessos);
         if (static_cast<int>(processoAtual->instrucoes.size()) > processoAtual->pc)
         {
-            cout << "Quantum esgotado para o processo ID=" << processoAtual->id << ". Bloqueio ocorrido." << "Parei: " << processoAtual->instrucoes[processoAtual->pc] << endl;
             stringstream ss;
             ss << "Ocorreu Preempção no processo: " << processoAtual->id << endl;
             salvarNoArquivo(ss.str());
@@ -225,7 +224,6 @@ void *monitorQuantum(void *args)
         Page paginaAtual;
         lock_guard<mutex> lock(mutexProcessos);
         {
-            cout << "Job concluido ID=" << processoAtual->id << "..." << endl;
             processoAtual->estado = TERMINADO;
             atualizarEstadoProcesso(processoAtual->id, "TERMINADO");
             salvarNaMemoria(processoAtual);
@@ -242,7 +240,7 @@ void processarInstrucoes(PCB &processoAtual)
     try
     {
         ThreadArgs args = {&processoAtual};
-        cout << "\n Abrindo thread id= " << processoAtual.id << " quantum= " << processoAtual.quantum << " estado= " << processoAtual.estado << endl;
+        // cout << "\n Abrindo thread id= " << processoAtual.id << " quantum= " << processoAtual.quantum << " estado= " << processoAtual.estado << endl;
         pthread_t monitorThread = {};
         int status_monitor = pthread_create(&monitorThread, nullptr, monitorQuantum, &args);
         if (status_monitor != 0)
@@ -292,6 +290,7 @@ void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantum
         ss << "Quantum Final: " << processoAtual.quantum << endl;
         ss << "Timestamp Final: " << timestamp_final << endl;
         ss << "PC: " << processoAtual.pc << endl;
+        ss << "Ciclo de Vida Inicial: " << processoAtual.ciclo_de_vida_inicial << endl;
         ss << "Ciclo de Vida: " << processoAtual.ciclo_de_vida << endl;
         ss << "Prioridade: " << processoAtual.prioridade << endl;
         ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;

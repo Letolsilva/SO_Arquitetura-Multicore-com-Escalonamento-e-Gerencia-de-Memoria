@@ -24,8 +24,8 @@ void *monitorarEstados(void *)
             lock_guard<mutex> lock(mutexListaCircular);
             for (const auto &[id, estado] : estadosProcessos)
             {
-                if(estado == "BLOQUEADO"){
-                    cout << " Processo ID =  "<< id << "- BLOQUEADO" << endl;
+                if (estado == "BLOQUEADO")
+                {
                     usleep(1000000); // Pausa por 1 segundo
                 }
             }
@@ -35,56 +35,65 @@ void *monitorarEstados(void *)
     pthread_exit(nullptr);
 }
 
-void* start(void* arg){
-    int op = *static_cast<int*>(arg); // Desreferencia o ponteiro para obter o valor de op
+void *start(void *arg)
+{
+    (void)arg;
     // ---------------- Bootloader ------------------//
     pthread_t thread_memoria = {};
     pthread_t thread_so = {};
     pthread_t thread_cpu[NUM_CORE];
-   // pthread_t threadMonitor ={};
+    // pthread_t threadMonitor ={};
     // ----------------------------------------------//
 
-    // Caminho para o diretório e arquivo
     const string diretorio_saida = "./output";
     const string arquivoPath = diretorio_saida + "/output.data";
 
     // Verifica se o diretório existe, se não, cria o diretório
-    if (!fs::exists(diretorio_saida)) {
-        try {
+    if (!fs::exists(diretorio_saida))
+    {
+        try
+        {
             fs::create_directories(diretorio_saida);
             cout << "Diretório 'output' criado com sucesso." << endl;
-        } catch (const fs::filesystem_error& e) {
+        }
+        catch (const fs::filesystem_error &e)
+        {
             cerr << "Erro ao criar o diretório 'output': " << e.what() << endl;
         }
     }
 
     // Inicializa o arquivo
     ofstream arquivo(arquivoPath, ios::trunc);
-    if (!arquivo.is_open()) {
+    if (!arquivo.is_open())
+    {
         cerr << "Erro ao inicializar o arquivo output.data!" << endl;
     }
 
     cout << "Arquivo output.data inicializado com sucesso." << endl;
     arquivo.close();
 
-    int status_memoria = povoando_Memoria(thread_memoria, op);
+    int status_memoria = povoando_Memoria(thread_memoria);
     pthread_join(thread_memoria, nullptr);
 
-    int status_so = iniciando_SO(thread_so,op);
+    int status_so = iniciando_SO(thread_so);
 
-   // pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
+    // pthread_create(&threadMonitor, nullptr, monitorarEstados, nullptr);
 
-    if (status_memoria == 0 && status_so == 0) {
-        for (int i = 0; i < NUM_CORE; ++i) {
-            int* coreIndex = new int(i);  // Não é mais necessário, mas mantido para ilustração
-            int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, (void*)coreIndex);
-            if (status_cpu != 0) {
+    if (status_memoria == 0 && status_so == 0)
+    {
+        for (int i = 0; i < NUM_CORE; ++i)
+        {
+            int *coreIndex = new int(i); // Não é mais necessário, mas mantido para ilustração
+            int status_cpu = pthread_create(&thread_cpu[i], nullptr, processarProcesso, (void *)coreIndex);
+            if (status_cpu != 0)
+            {
                 cerr << "Erro ao criar a thread da CPU!" << endl;
-                return nullptr;  // Saída da thread em caso de erro
+                return nullptr; // Saída da thread em caso de erro
             }
         }
 
-        for (int i = 0; i < NUM_CORE; ++i) {
+        for (int i = 0; i < NUM_CORE; ++i)
+        {
             pthread_join(thread_cpu[i], nullptr);
         }
 
@@ -95,7 +104,5 @@ void* start(void* arg){
         //  pthread_join(threadMonitor, nullptr);
     }
 
-
-    return nullptr;  // Indica que a thread terminou
+    return nullptr; // Indica que a thread terminou
 }
-

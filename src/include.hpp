@@ -27,12 +27,13 @@ enum EstadoProcesso
 {
     PRONTO,
     BLOQUEADO,
-    EXECUTANDO, 
+    EXECUTANDO,
     TERMINADO
 };
 
 extern int PC;
 extern int CLOCK;
+extern int op;
 
 extern unordered_map<int, int> cache;
 extern vector<int> principal;
@@ -43,15 +44,16 @@ extern bool perifericos[NUM_PERIFERICOS];
 
 struct PCB
 {
-    int id;          // ID do processo
-    int quantum;     // Quantum inicial
-    int timestamp;   // Timestamp inicial
+    int id;        // ID do processo
+    int quantum;   // Quantum inicial
+    int timestamp; // Timestamp inicial
     int timestamp_inicial;
     int prioridade;  // Prioridade do processo
-    int baseMemoria;            // Endereço base de memória
+    int baseMemoria; // Endereço base de memória
     int limiteMemoria;
-    int resultado;             // Limite de alocação de memória
+    int resultado; // Limite de alocação de memória
     int ciclo_de_vida;
+    int ciclo_de_vida_inicial;
     int pc;
     vector<int> registradores; // Banco de registradores
     EstadoProcesso estado;     // Estado atual do processo
@@ -78,7 +80,7 @@ struct SO
 //----Memoria
 extern vector<Page> memoryPages;
 extern int currentPageIndex;
-extern vector<PCB> memoria;  //?
+extern vector<PCB> memoria; //?
 extern mutex mutexProcessos;
 extern mutex mutexMemoria;
 extern mutex output;
@@ -88,13 +90,14 @@ extern vector<int> listaCircular_SO;
 extern vector<SO> listaCircular_SO_2;
 extern size_t indiceAtual;
 extern mutex mutexListaCircular;
-extern unordered_map<int, string> estadosProcessos; 
+extern unordered_map<int, string> estadosProcessos;
 
 //----Hash para tempos de execução das operações (para SJF)
-extern unordered_map<string, int> temposExecucao ;
+extern unordered_map<string, int> temposExecucao;
 
-struct ThreadArgs {
-    PCB* processoAtual;
+struct ThreadArgs
+{
+    PCB *processoAtual;
 };
 
 #endif

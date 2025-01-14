@@ -2,7 +2,7 @@
 #define SO_HPP
 #include "include.hpp"
 
-int iniciando_SO(pthread_t &thread_SO, int op);
+int iniciando_SO(pthread_t &thread_SO);
 int obterProximoProcesso();
 void imprimirProcessosEsperando();
 void imprimirListaCircular();
