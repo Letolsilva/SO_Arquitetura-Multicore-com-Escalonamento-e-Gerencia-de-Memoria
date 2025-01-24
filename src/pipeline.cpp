@@ -1,4 +1,5 @@
 #include "pipeline.hpp"
+#include "cache.hpp"
 #include "ula.hpp"
 
 void WriteBack(int resultado, int &quantum, PCB &processoAtual)
@@ -43,6 +44,12 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     }
     else if (instrucao == '@')
     {
+        /*
+        if(check_memoria_Cache(instrucao, registradores[info2], registradores[info3], soma, false)){
+            return;
+        }
+        */
+
         for (int i = 0; i < info3; i++)
         {
             if (quantum <= 0){
@@ -54,24 +61,29 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
             if (registradorAtual > info2)
             {
                 registradorAtual = info1;
-
             }
             quantum--;
             CLOCK++;
         }
+       // check_memoria_Cache(instrucao, registradores[info2], registradores[info3], soma,true);
         MemoryAccess(soma, registradores, info1, quantum, processoAtual);
     }
     else if ((instrucao != '&') && (instrucao != '@') && (instrucao != '?'))
     {
+        int resultado = 0;
+        if(check_memoria_Cache(instrucao, registradores[info2], registradores[info3], resultado, false)){
+            return;
+        }
+
         if (quantum <= 0){
-                processoAtual.estado = BLOQUEADO;
+            processoAtual.estado = BLOQUEADO;
             return;
         }
                    
-
-        int resultado = ULA(registradores[info2], registradores[info3], instrucao);
+        resultado = ULA(registradores[info2], registradores[info3], instrucao);
         quantum--;
         CLOCK++;
+        check_memoria_Cache(instrucao, registradores[info2], registradores[info3], resultado,true);
         MemoryAccess(resultado, registradores, info1, quantum, processoAtual);
     }
     else if(instrucao == '&'){
@@ -80,8 +92,12 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     }
     else if (instrucao == '?')
     {
-        bool resposta;
-        // cout << registradores[info1] << " " << info4 << " " << registradores[info2] << ": ";
+        bool resposta = NULL;
+        char auxiliar = info4[0];
+        if(check_memoria_Cache(auxiliar, registradores[info1], registradores[info2], static_cast<int>(resposta), false)){
+            return;
+        }
+
         if (info4 == "<")
         {
             if (registradores[info1] < registradores[info2])
@@ -106,6 +122,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                 quantum--;
                 CLOCK++;
             }
+
         }
         else if (info4 == ">")
         {
@@ -155,7 +172,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                 resposta = false;
                 quantum--;
                 CLOCK++;
-
             }
         }
         else if (info4 == "!")
@@ -182,6 +198,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                 CLOCK++;
             }
         }
+        check_memoria_Cache(auxiliar, registradores[info1], registradores[info2], static_cast<int>(resposta), true);
         MemoryAccess(resposta, registradores, info1, quantum, processoAtual);
     }
 }

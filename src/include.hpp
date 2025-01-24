@@ -16,8 +16,10 @@
 #include <sched.h>
 #include <random>
 #include <algorithm>
+#include <optional>
 
 #define NUM_PERIFERICOS 5
+#define TAM_CACHE 4
 #define NUM_CORE 2
 
 using namespace std;
@@ -30,6 +32,7 @@ enum EstadoProcesso
     EXECUTANDO,
     TERMINADO
 };
+
 
 extern int PC;
 extern int CLOCK;
@@ -79,6 +82,7 @@ struct SO
 
 //----Memoria
 extern vector<Page> memoryPages;
+extern unordered_map<string,int> memoriaCache;
 extern int currentPageIndex;
 extern vector<PCB> memoria; //?
 extern mutex mutexProcessos;
