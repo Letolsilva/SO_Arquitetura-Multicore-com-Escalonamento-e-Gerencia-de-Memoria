@@ -59,6 +59,7 @@ struct PCB
     int ciclo_de_vida_inicial;
     int pc;
     vector<int> registradores; // Banco de registradores
+    vector<string> conjunto_chaves;
     EstadoProcesso estado;     // Estado atual do processo
     string nomeArquivo;        // Nome do arquivo associado
     vector<string> instrucoes; // Instruções do processo

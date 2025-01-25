@@ -8,5 +8,6 @@ bool buscarProcessoNaMemoria(int idProcesso, Page &paginaAtual, PCB &processoAtu
 string obterEstadoProcesso(const PCB &processo);
 void processarInstrucoes(PCB &processoAtual);
 void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantumInicial, int &var);
+string gerardor_Chave(char instrucao, int info1, int info2);
 
 #endif

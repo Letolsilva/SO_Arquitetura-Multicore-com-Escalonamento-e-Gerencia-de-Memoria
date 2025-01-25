@@ -1,23 +1,11 @@
 #include "cache.hpp"
+#include "functions.hpp"
 
 unordered_map<string,int> memoriaCache;
 
 bool check_memoria_Cache(char instrucao, int info1, int info2, int resultado, bool controle){
 
-    string x ;
-    if(instrucao == '+' && instrucao == '*')
-    {
-        if(info1 > info2){
-            x = to_string(instrucao) + to_string(info1) + to_string(info2);
-        }
-        else{
-            x = to_string(instrucao) + to_string(info2) + to_string(info1);
-        }
-    }
-    else
-    {
-        x = to_string(instrucao) + to_string(info1) + to_string(info2);
-    }
+    string x = gerardor_Chave(instrucao, info1, info2);
 
     auto it = memoriaCache.find(x);
     if (it != memoriaCache.end()) 

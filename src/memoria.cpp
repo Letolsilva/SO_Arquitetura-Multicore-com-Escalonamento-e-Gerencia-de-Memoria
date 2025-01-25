@@ -105,6 +105,7 @@ void carregarProcessosNaMemoria()
     {
         if (entry.path().extension() == ".data")
         {
+            int vetor_registador_auxiliar[8];
             PCB pcb;
             pcb.id = idAtual++;
             pcb.nomeArquivo = entry.path().string();
@@ -120,7 +121,6 @@ void carregarProcessosNaMemoria()
             pcb.registradores.resize(8, 0);
 
             ifstream arquivo(pcb.nomeArquivo);
-
             while (getline(arquivo, linha))
             {
                 pcb.instrucoes.push_back(linha);
@@ -146,12 +146,35 @@ void carregarProcessosNaMemoria()
                         pcb.ciclo_de_vida += tempoAdicional;
                     }
                 }
+                else if(op == 4){
+                    stringstream ss(linha);
+                    string chave = "";
+                    ss >> instrucao >> info1 >> info2 >> info3;
+                    
+                    if(instrucao == "="){
+                        vetor_registador_auxiliar[info1] = info2;
+                    }
+                    else{
+                        chave =  gerardor_Chave(instrucao[0], vetor_registador_auxiliar[info2], vetor_registador_auxiliar[info3]);
+                        cout << "Chave gerada na memoria: " << chave << endl;
+                        pcb.conjunto_chaves.push_back(chave);
+                    }     
+                }
                 else
                 {
                     pcb.ciclo_de_vida = 0;
                 }
                 pcb.ciclo_de_vida_inicial = pcb.ciclo_de_vida;
             }
+
+            // Imprime o vetor vetor_registador_auxiliar
+            cout << "Vetor de registradores auxiliar: ";
+            for (int i = 0; i < 8; ++i)
+            {
+                cout << std::setw(2) << vetor_registador_auxiliar[i] << " ";
+            }
+            cout << endl;
+
 
             arquivo.close();
 

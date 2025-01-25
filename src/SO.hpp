@@ -12,4 +12,7 @@ void *FCFS(void *arg);
 void *First_Remain_Job_First(void *arg);
 void remover_ListaCircular(int id_processo);
 
+void gerar_lista_2();
+string codificandoJob(Page pag);
+
 #endif

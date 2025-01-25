@@ -56,7 +56,33 @@ void gerarLista()
     }
 }
 
+void gerar_lista_2()
+{
+    unordered_map<string, vector<SO>> pre_lista;
+    for(const Page &pag : memoryPages){
+        SO aux_job;
+        aux_job.id_processo = pag.pcb.id;
+        aux_job.ciclo_de_vida = pag.pcb.ciclo_de_vida;
+        aux_job.prioridade = pag.pcb.prioridade;
+        //pre_lista[key].push_back(aux_job);
+        (void)aux_job;
+
+
+    }
+}
+
 void *FCFS(void *arg)
+{
+    (void)arg;
+
+    while (!listaCircular_SO_2.empty())
+    {
+    }
+
+    return nullptr;
+}
+
+void *Similiaridade(void *arg)
 {
     (void)arg;
 
@@ -75,7 +101,7 @@ void *First_Remain_Job_First(void *arg)
     {
         lock_guard<mutex> lock(mutexListaCircular);
         sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b)
-             { return a.ciclo_de_vida < b.ciclo_de_vida; });
+            { return a.ciclo_de_vida < b.ciclo_de_vida; });
     }
 
     return nullptr;
@@ -126,6 +152,7 @@ int obterProximoProcesso()
 int iniciando_SO(pthread_t &thread_SO)
 {
     gerarLista();
+    //gerar_lista_2();
     using namespace std::chrono;
 
     // for (const auto &so : listaCircular_SO_2)
@@ -147,6 +174,9 @@ int iniciando_SO(pthread_t &thread_SO)
         break;
     case 3:
         ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
+        break;
+    case 4:
+        ret = pthread_create(&thread_SO, nullptr, Similiaridade, nullptr);
         break;
     default:
         return 1;

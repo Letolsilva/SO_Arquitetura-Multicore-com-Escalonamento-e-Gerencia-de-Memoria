@@ -9,6 +9,27 @@ vector<Page> memoryPages; // Memoria
 mutex mutexProcessos;     // Mutex para controle de acesso ao vetor
 mutex output;
 
+string gerardor_Chave(char instrucao, int info1, int info2){
+    string chave ;
+
+    if(instrucao == '+' || instrucao == '*')
+    {
+        if(info1 > info2){
+            chave = to_string(info1) + "." + to_string(instrucao) + "." + to_string(info2);
+        }
+        else{
+            chave =  to_string(info2) + "." + to_string(instrucao) + "."  + to_string(info1);
+        }
+    }
+    else
+    {
+        chave = to_string(info1) + "." + to_string(instrucao) + "."  + to_string(info2);
+    }
+
+    return chave;
+
+}
+
 // Função auxiliar para salvar no arquivo
 void salvarNoArquivo(const string &conteudo)
 {
