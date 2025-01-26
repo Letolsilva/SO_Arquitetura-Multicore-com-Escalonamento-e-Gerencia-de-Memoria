@@ -18,6 +18,8 @@
 #include <random>
 #include <algorithm>
 #include <optional>
+#include <set>
+#include <unordered_set>
 
 #define NUM_PERIFERICOS 5
 #define TAM_CACHE 4

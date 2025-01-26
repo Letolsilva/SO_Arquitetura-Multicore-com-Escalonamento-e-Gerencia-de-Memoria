@@ -21,6 +21,7 @@ int main()
     cout << "\n\t\t [1] = FCFS.";
     cout << "\n\t\t [2] = Shortest Remaining Job First";
     cout << "\n\t\t [3] = Prioridade";
+    cout << "\n\t\t [3] = Similiaridade";
     cout << "\n\t\t [>] = ";
 
     while (true) {
