@@ -22,7 +22,7 @@
 #include <unordered_set>
 
 #define NUM_PERIFERICOS 5
-#define TAM_CACHE 4
+#define TAM_CACHE 6
 #define NUM_CORE 2
 
 using namespace std;

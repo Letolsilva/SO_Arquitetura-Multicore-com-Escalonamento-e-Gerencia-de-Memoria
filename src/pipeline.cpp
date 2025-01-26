@@ -72,7 +72,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     {
         int resultado = 0;
         if(check_memoria_Cache(instrucao, registradores[info2], registradores[info3], resultado, false)){
-            cout << " \n\t AChei no cache" << endl;
             return;
         }
 
@@ -95,9 +94,9 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     {
         bool resposta = NULL;
         char auxiliar = info4[0];
+        
         if(check_memoria_Cache(auxiliar, registradores[info1], registradores[info2], static_cast<int>(resposta), false)){
-                        cout << " \n\t AChei no cache" << endl;
-
+            cout << " \n\t AChei no cache" << endl;
             return;
         }
 
@@ -109,7 +108,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     processoAtual.estado = BLOQUEADO;
                     return;
                 } 
-                // cout << "True" << endl;
                 resposta = true;
                 quantum--;
                 CLOCK++;
@@ -120,7 +118,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     processoAtual.estado = BLOQUEADO;
                     return;
                 } 
-                // cout << "False" << endl;
                 resposta = false;
                 quantum--;
                 CLOCK++;
@@ -135,7 +132,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     processoAtual.estado = BLOQUEADO;
                     return;
                 } 
-                // cout << "True" << endl;
                 resposta = true;
                 quantum--;
                 CLOCK++;
@@ -147,7 +143,6 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                     return;
                 } 
                 resposta = false;
-                // cout << "False" << endl;
                 quantum--;
                 CLOCK++;
             }
@@ -201,6 +196,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
                 CLOCK++;
             }
         }
+
         check_memoria_Cache(auxiliar, registradores[info1], registradores[info2], static_cast<int>(resposta), true);
         MemoryAccess(resposta, registradores, info1, quantum, processoAtual);
     }
@@ -217,6 +213,7 @@ void InstructionDecode(char instrucao, int info1, int info2, int info3, string i
     sleep(0.1);
     quantum--;
     CLOCK++;
+
     Execute(instrucao, info1, info2, info3, info4, registradores, quantum, processoAtual);
     
 }
@@ -248,10 +245,8 @@ void InstructionFetch(int *registradores, string linha, int &quantum, PCB &proce
         ss >> info4;
     }
 
-   // PC++;
     quantum--;
     CLOCK++;
-    
     
     InstructionDecode(instrucao, info1, info2, info3, info4, registradores, quantum, processoAtual);
 
@@ -261,12 +256,4 @@ void InstructionFetch(int *registradores, string linha, int &quantum, PCB &proce
         processoAtual.pc++;
     
     }
-    /*
-    if (quantum <= 0){
-        processoAtual.estado = BLOQUEADO;
-        return;
-    } */
-    
-
-
 }

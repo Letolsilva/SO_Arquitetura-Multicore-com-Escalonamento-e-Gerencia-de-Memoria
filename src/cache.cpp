@@ -10,7 +10,7 @@ bool check_memoria_Cache(char instrucao, int info1, int info2, int resultado, bo
     auto it = memoriaCache.find(x);
     if (it != memoriaCache.end()) 
     {
-        cout << "Valor encontrado: " << it->second << endl;
+        cout << " \n\t  - AChei no cache: " << x <<  "Valor encontrado: " << it->second << endl;
         return true;
     } 
     else 
@@ -29,7 +29,7 @@ bool check_memoria_Cache(char instrucao, int info1, int info2, int resultado, bo
 
             }
             memoriaCache[x] = resultado;
-            cout << "Valor salvo: " <<  memoriaCache[x]  <<endl;
+            cout << "Valor salvo: " <<  memoriaCache[x]  << "chave : " << x << endl;
         }
     }
 

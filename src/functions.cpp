@@ -315,6 +315,7 @@ void atualizarESalvarProcesso(PCB &processoAtual, stringstream &ss, int &quantum
         ss << "Ciclo de Vida: " << processoAtual.ciclo_de_vida << endl;
         ss << "Prioridade: " << processoAtual.prioridade << endl;
         ss << "Estado Final: " << obterEstadoProcesso(processoAtual) << endl;
+        ss << "CLOCK: " << CLOCK << endl;
         ss << "=============================" << endl;
         salvarNoArquivo(ss.str());
     }
