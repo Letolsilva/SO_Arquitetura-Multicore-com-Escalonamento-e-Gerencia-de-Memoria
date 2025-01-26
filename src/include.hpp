@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
 #include <sstream>
 #include <unistd.h>
 #include <unordered_map>
@@ -79,6 +80,7 @@ struct SO
     int id_processo;
     int ciclo_de_vida;
     int prioridade;
+    vector<string> conjunto_chaves;
 };
 
 //----Memoria

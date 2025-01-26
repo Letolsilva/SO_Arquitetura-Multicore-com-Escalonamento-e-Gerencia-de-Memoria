@@ -72,6 +72,7 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
     {
         int resultado = 0;
         if(check_memoria_Cache(instrucao, registradores[info2], registradores[info3], resultado, false)){
+            cout << " \n\t AChei no cache" << endl;
             return;
         }
 
@@ -95,6 +96,8 @@ void Execute(char instrucao, int info1, int info2, int info3, string info4, int 
         bool resposta = NULL;
         char auxiliar = info4[0];
         if(check_memoria_Cache(auxiliar, registradores[info1], registradores[info2], static_cast<int>(resposta), false)){
+                        cout << " \n\t AChei no cache" << endl;
+
             return;
         }
 

@@ -14,5 +14,7 @@ void remover_ListaCircular(int id_processo);
 
 void gerar_lista_2();
 string codificandoJob(Page pag);
+std::map<std::string, std::vector<PCB>> agruparJobsPorChaves(const std::vector<PCB>& jobs);
+void gerar_lista_similiaridade();
 
 #endif

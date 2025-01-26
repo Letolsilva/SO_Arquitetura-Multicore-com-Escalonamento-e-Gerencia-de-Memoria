@@ -31,13 +31,14 @@ void add_ListaCircular(PCB processo)
 {
     lock_guard<mutex> lock(mutexListaCircular);
     // Verifica se o processo já está na lista
-    auto it = find(listaCircular_SO.begin(), listaCircular_SO.end(), processo.id);
-    if (it == listaCircular_SO.end())
+    auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
+                      [&processo](const SO &so) { return so.id_processo == processo.id; });    if (it == listaCircular_SO_2.end())
     {
         SO aux_job;
         aux_job.id_processo = processo.id;
         aux_job.ciclo_de_vida = processo.ciclo_de_vida;
         aux_job.prioridade = processo.prioridade;
+        aux_job.conjunto_chaves = processo.conjunto_chaves;
         listaCircular_SO_2.push_back(aux_job); // Adiciona apenas se não existir
         // estadosProcessos[idProcesso] = "PRONTO";
     }
@@ -47,27 +48,46 @@ void add_ListaCircular(PCB processo)
     }
 }
 
+std::map<std::string, std::vector<PCB>> agruparJobsPorChaves(const std::vector<PCB>& jobs) {
+    std::map<std::string, std::vector<PCB>> grupos;
+
+    for (const auto& job : jobs) {
+        for (const auto& chave : job.conjunto_chaves) {
+            grupos[chave].push_back(job);
+        }
+    }
+
+    return grupos;
+}
+
 void gerarLista()
 {
-
     for (const Page &pag : memoryPages)
     {
         add_ListaCircular(pag.pcb);
     }
 }
 
-void gerar_lista_2()
+void gerar_lista_similiaridade()
 {
-    unordered_map<string, vector<SO>> pre_lista;
-    for(const Page &pag : memoryPages){
-        SO aux_job;
-        aux_job.id_processo = pag.pcb.id;
-        aux_job.ciclo_de_vida = pag.pcb.ciclo_de_vida;
-        aux_job.prioridade = pag.pcb.prioridade;
-        //pre_lista[key].push_back(aux_job);
-        (void)aux_job;
+    vector<PCB> listaJob;
 
+    for (const Page &pag : memoryPages)
+    {
+       // add_ListaCircular(pag.pcb);
+        listaJob.push_back(pag.pcb);
+    }
 
+    auto grupos = agruparJobsPorChaves(listaJob);
+
+    for (const auto& grupo : grupos) {
+        cout << "\n\t -> Grupo  ... " << endl;
+
+        std::cout << "Chave: " << grupo.first << std::endl;
+        for (const auto& job : grupo.second){
+            cout << "ID do Job: " << job.id << std::endl;
+            add_ListaCircular(job);
+        }
     }
 }
 
@@ -151,18 +171,27 @@ int obterProximoProcesso()
 
 int iniciando_SO(pthread_t &thread_SO)
 {
-    gerarLista();
-    //gerar_lista_2();
+    if(op  == 4){
+        gerar_lista_similiaridade();
+    }
+    else{
+        gerarLista();
+    }
+
+    std::cout << "-------------1-----------" << std::endl;
+    for (const auto& so : listaCircular_SO_2) {
+        std::cout << "ID do Processo: " << so.id_processo << std::endl;
+        std::cout << "Ciclo de Vida: " << so.ciclo_de_vida << std::endl;
+        std::cout << "Prioridade: " << so.prioridade << std::endl;
+        std::cout << "-------------------------" << std::endl;
+    }
+    std::cout << "------------@------------" << std::endl;
+
+    
     using namespace std::chrono;
 
-    // for (const auto &so : listaCircular_SO_2)
-    // {
-    //     std::cout << "ID: " << so.id_processo
-    //               << ", Ciclo de Vida: " << so.ciclo_de_vida
-    //               << ", Prioridade: " << so.prioridade << std::endl;
-    // }
-
     int ret = 0;
+
     switch (op)
     {
     case 1:
