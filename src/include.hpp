@@ -26,6 +26,7 @@
 #define NUM_CORE 2
 
 using namespace std;
+using namespace std::chrono;
 namespace fs = filesystem;
 
 enum EstadoProcesso

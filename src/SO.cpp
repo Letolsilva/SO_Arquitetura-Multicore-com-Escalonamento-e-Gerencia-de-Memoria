@@ -231,8 +231,14 @@ int obterProximoProcesso()
 
 int iniciando_SO(pthread_t &thread_SO)
 {
+
     if(op  == 4){
+        auto inicio = high_resolution_clock::now();
         gerar_lista_similiaridade();
+        auto fim = high_resolution_clock::now();
+        auto duracao = duration_cast<nanoseconds>(fim - inicio);
+        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n" << endl;
+
     }
     else{
         gerarLista();
@@ -246,9 +252,6 @@ int iniciando_SO(pthread_t &thread_SO)
         cout << "-------------------------" << endl;
     }
     //cout << "------------@------------" << endl;
-
-    
-    using namespace chrono;
 
     int ret = 0;
 

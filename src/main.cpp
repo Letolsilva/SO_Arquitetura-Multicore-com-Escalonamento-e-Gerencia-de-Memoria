@@ -14,9 +14,6 @@ vector<mutex> mutexCores(NUM_CORE);
 
 int main()
 {
-
-    using namespace std::chrono;
-
     cout << "\n\n\t ----------{Escolha a Politica de Escalanomento}---------- " << endl;
     cout << "\n\t\t [1] = FCFS.";
     cout << "\n\t\t [2] = Shortest Remaining Job First";

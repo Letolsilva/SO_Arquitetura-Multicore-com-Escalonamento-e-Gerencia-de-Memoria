@@ -1,0 +1,293 @@
+Thread_CPU1 processando processo ID=1
+Estado: PRONTO
+=== Processo ID: 1 ===
+Nome Arquivo: data/processo4.data
+Base Memoria: 0
+Limite Memoria: 1
+Quantum Inicial: 22
+Quantum Historico: 22 - 
+Timestamp Inicial: 0
+Instruções:
+  - = 0 1
+  - = 1 1
+  - + 1 1 0
+Resultado: 2
+Quantum Final: 13
+Timestamp Final: 9
+PC: 3
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 1
+Estado Final: TERMINADO
+CLOCK: 21
+=============================
+
+Thread_CPU0 processando processo ID=11
+Estado: PRONTO
+=== Processo ID: 11 ===
+Nome Arquivo: data/processo4 copy.data
+Base Memoria: 10
+Limite Memoria: 11
+Quantum Inicial: 36
+Quantum Historico: 36 - 
+Timestamp Inicial: 0
+Instruções:
+  - = 2 3
+  - = 3 7
+  - * 4 2 3
+  - = 0 6
+  - = 1 8
+  - ? 0 1 <
+  - = 0 1
+  - = 1 1
+  - + 1 1 0
+Resultado: 1
+Quantum Final: 12
+Timestamp Final: 24
+PC: 9
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 8
+Estado Final: TERMINADO
+CLOCK: 33
+=============================
+
+Thread_CPU1 processando processo ID=2
+Estado: PRONTO
+=== Processo ID: 2 ===
+Nome Arquivo: data/processo3.data
+Base Memoria: 1
+Limite Memoria: 2
+Quantum Inicial: 38
+Quantum Historico: 38 - 
+Timestamp Inicial: 9
+Instruções:
+  - = 0 2
+  - = 1 6
+  - / 0 1 0
+Resultado: 3
+Quantum Final: 29
+Timestamp Final: 18
+PC: 3
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 9
+Estado Final: TERMINADO
+CLOCK: 42
+=============================
+
+Ocorreu Preempção no processo: 4
+
+Thread_CPU1 processando processo ID=5
+Estado: PRONTO
+=== Processo ID: 5 ===
+Nome Arquivo: data/processo5 copy.data
+Base Memoria: 4
+Limite Memoria: 5
+Quantum Inicial: 42
+Quantum Historico: 42 - 
+Timestamp Inicial: 18
+Instruções:
+  - = 0 14
+  - = 1 2
+  - - 2 1 0
+  - = 0 2
+  - = 1 6
+  - / 0 1 0
+  - = 0 17
+  - = 1 2
+  - - 2 1 0
+Resultado: 0
+Quantum Final: 24
+Timestamp Final: 36
+PC: 9
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 1
+Estado Final: TERMINADO
+CLOCK: 89
+=============================
+
+Thread_CPU0 processando processo ID=6
+Estado: PRONTO
+=== Processo ID: 6 ===
+Nome Arquivo: data/processo1 copy.data
+Base Memoria: 5
+Limite Memoria: 6
+Quantum Inicial: 50
+Quantum Historico: 50 - 
+Timestamp Inicial: 53
+Instruções:
+  - = 3 7
+  - = 4 1
+  - - 0 3 4
+  - = 0 2
+  - = 1 6
+  - / 0 1 0
+  - = 3 7
+  - = 4 1
+  - + 0 3 4
+Resultado: 8
+Quantum Final: 26
+Timestamp Final: 77
+PC: 9
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 5
+Estado Final: TERMINADO
+CLOCK: 113
+=============================
+
+Thread_CPU1 processando processo ID=3
+Estado: PRONTO
+=== Processo ID: 3 ===
+Nome Arquivo: data/processo5.data
+Base Memoria: 2
+Limite Memoria: 3
+Quantum Inicial: 43
+Quantum Historico: 43 - 
+Timestamp Inicial: 36
+Instruções:
+  - = 0 14
+  - = 1 2
+  - - 2 1 0
+Resultado: 0
+Quantum Final: 37
+Timestamp Final: 42
+PC: 3
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 6
+Estado Final: TERMINADO
+CLOCK: 119
+=============================
+
+Thread_CPU0 processando processo ID=7
+Estado: PRONTO
+=== Processo ID: 7 ===
+Nome Arquivo: data/processo2.data
+Base Memoria: 6
+Limite Memoria: 7
+Quantum Inicial: 28
+Quantum Historico: 28 - 
+Timestamp Inicial: 77
+Instruções:
+  - = 0 2
+  - = 1 3
+  - = 3 5
+  - + 2 0 1
+Resultado: 5
+Quantum Final: 17
+Timestamp Final: 88
+PC: 4
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 7
+Estado Final: TERMINADO
+CLOCK: 130
+=============================
+
+Thread_CPU1 processando processo ID=8
+Estado: PRONTO
+=== Processo ID: 8 ===
+Nome Arquivo: data/processo7.data
+Base Memoria: 7
+Limite Memoria: 8
+Quantum Inicial: 39
+Quantum Historico: 39 - 
+Timestamp Inicial: 42
+Instruções:
+  - = 0 10
+  - & 0
+Resultado: 10
+Quantum Final: 33
+Timestamp Final: 48
+PC: 2
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 0
+Estado Final: TERMINADO
+CLOCK: 136
+=============================
+
+Thread_CPU0 processando processo ID=9
+Estado: PRONTO
+=== Processo ID: 9 ===
+Nome Arquivo: data/processo6.data
+Base Memoria: 8
+Limite Memoria: 9
+Quantum Inicial: 25
+Quantum Historico: 25 - 
+Timestamp Inicial: 88
+Instruções:
+  - = 0 2
+  - = 1 3
+  - ? 0 1 <
+Resultado: 1
+Quantum Final: 16
+Timestamp Final: 97
+PC: 3
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 4
+Estado Final: TERMINADO
+CLOCK: 145
+=============================
+
+Thread_CPU1 processando processo ID=10
+Estado: PRONTO
+=== Processo ID: 10 ===
+Nome Arquivo: data/processo1.data
+Base Memoria: 9
+Limite Memoria: 10
+Quantum Inicial: 34
+Quantum Historico: 34 - 
+Timestamp Inicial: 48
+Instruções:
+  - = 0 14
+  - = 1 7
+  - + 2 1 0
+Resultado: 21
+Quantum Final: 25
+Timestamp Final: 57
+PC: 3
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 3
+Estado Final: TERMINADO
+CLOCK: 154
+=============================
+
+Thread_CPU0 processando processo ID=4
+Estado: PRONTO
+=== Processo ID: 4 ===
+Nome Arquivo: data/processo5 copy 2.data
+Base Memoria: 3
+Limite Memoria: 4
+Quantum Inicial: 23
+Quantum Historico: 29 - 23 - 
+Timestamp Inicial: 24
+Instruções:
+  - = 0 14
+  - = 1 2
+  - - 2 1 0
+  - = 0 14
+  - = 1 2
+  - - 2 1 0
+  - = 0 2
+  - = 1 6
+  - / 0 1 0
+  - = 0 17
+  - = 1 2
+  - - 2 1 0
+Resultado: -15
+Quantum Final: 18
+Timestamp Final: 102
+PC: 12
+Ciclo de Vida Inicial: 0
+Ciclo de Vida: 0
+Prioridade: 8
+Estado Final: TERMINADO
+CLOCK: 159
+=============================
+
