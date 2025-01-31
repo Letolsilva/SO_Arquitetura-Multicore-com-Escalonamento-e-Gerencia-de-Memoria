@@ -32,7 +32,9 @@ void add_ListaCircular(PCB processo)
     lock_guard<mutex> lock(mutexListaCircular);
     // Verifica se o processo já está na lista
     auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
-                      [&processo](const SO &so) { return so.id_processo == processo.id; });    if (it == listaCircular_SO_2.end())
+                      [&processo](const SO &so)
+                      { return so.id_processo == processo.id; });
+    if (it == listaCircular_SO_2.end())
     {
         SO aux_job;
         aux_job.id_processo = processo.id;
@@ -53,7 +55,8 @@ void add_ListaCircular_adptado(SO processo)
     lock_guard<mutex> lock(mutexListaCircular);
     // Verifica se o processo já está na lista
     auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
-                      [&processo](const SO &so) { return so.id_processo == processo.id_processo; });
+                      [&processo](const SO &so)
+                      { return so.id_processo == processo.id_processo; });
 
     if (it == listaCircular_SO_2.end())
     {
@@ -74,14 +77,17 @@ void gerarLista()
     }
 }
 
-double jaccardIndex(const vector<string>& vec1, const vector<string>& vec2) {
+double jaccardIndex(const vector<string> &vec1, const vector<string> &vec2)
+{
     // Transformando os vetores em conjuntos para facilitar o cálculo
     unordered_set<string> set1(vec1.begin(), vec1.end());
     unordered_set<string> set2(vec2.begin(), vec2.end());
 
     int intersection = 0;
-    for (const auto& chave : set1) {
-        if (set2.find(chave) != set2.end()) {
+    for (const auto &chave : set1)
+    {
+        if (set2.find(chave) != set2.end())
+        {
             intersection++;
         }
     }
@@ -89,11 +95,13 @@ double jaccardIndex(const vector<string>& vec1, const vector<string>& vec2) {
     return static_cast<double>(intersection) / unionSet;
 }
 
-vector<map<int, SO>> aplicarLSH(const vector<PCB>& jobs, double threshold) {
-    vector<map<int, SO>> buckets;  // Para armazenar os grupos de jobs
-    
+vector<map<int, SO>> aplicarLSH(const vector<PCB> &jobs, double threshold)
+{
+    vector<map<int, SO>> buckets; // Para armazenar os grupos de jobs
+
     // Aplicando uma função hash simples
-    for (const auto& job : jobs) {
+    for (const auto &job : jobs)
+    {
         bool added = false;
 
         SO aux_job;
@@ -101,22 +109,27 @@ vector<map<int, SO>> aplicarLSH(const vector<PCB>& jobs, double threshold) {
         aux_job.ciclo_de_vida = job.ciclo_de_vida;
         aux_job.prioridade = job.prioridade;
         aux_job.conjunto_chaves = job.conjunto_chaves;
-        
+
         // Verificando em quais buckets este job deve ser inserido
-        for (auto& bucket : buckets) {
-            for (const auto& existingJobPair : bucket) {
-                const SO& existingJob = existingJobPair.second;  // Acesso ao valor do map
-                if (jaccardIndex(job.conjunto_chaves, existingJob.conjunto_chaves) >= threshold) {
-                    bucket[aux_job.id_processo] = aux_job;  // Adiciona o job ao bucket com alta interseção
+        for (auto &bucket : buckets)
+        {
+            for (const auto &existingJobPair : bucket)
+            {
+                const SO &existingJob = existingJobPair.second; // Acesso ao valor do map
+                if (jaccardIndex(job.conjunto_chaves, existingJob.conjunto_chaves) >= threshold)
+                {
+                    bucket[aux_job.id_processo] = aux_job; // Adiciona o job ao bucket com alta interseção
                     added = true;
                     break;
                 }
             }
-            if (added) break;
+            if (added)
+                break;
         }
 
         // Se o job não foi adicionado a nenhum bucket, criamos um novo bucket
-        if (!added) {
+        if (!added)
+        {
             map<int, SO> newBucket;
             newBucket[aux_job.id_processo] = aux_job;
             buckets.push_back(newBucket);
@@ -129,20 +142,23 @@ vector<map<int, SO>> aplicarLSH(const vector<PCB>& jobs, double threshold) {
 void gerar_lista_similiaridade()
 {
     vector<PCB> listaJob;
-    double threshold = 0.1;
+    double threshold = 0.3;
 
-    for (const Page &pag : memoryPages) {
+    for (const Page &pag : memoryPages)
+    {
         listaJob.push_back(pag.pcb);
     }
-    
+
     auto grupos = aplicarLSH(listaJob, threshold);
 
     int contador = 1;
     cout << "\n-------------1-----------" << endl;
-    for (const auto& grupo : grupos) {
+    for (const auto &grupo : grupos)
+    {
         cout << "Grupo " << contador++ << ": ";
-        for (const auto& jobPair : grupo) {
-            const SO& job = jobPair.second;  // Acesso ao valor do map
+        for (const auto &jobPair : grupo)
+        {
+            const SO &job = jobPair.second; // Acesso ao valor do map
             add_ListaCircular_adptado(job);
             cout << "\n\t Job ID: " << job.id_processo << endl;
         }
@@ -181,7 +197,7 @@ void *First_Remain_Job_First(void *arg)
     {
         lock_guard<mutex> lock(mutexListaCircular);
         sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b)
-            { return a.ciclo_de_vida < b.ciclo_de_vida; });
+             { return a.ciclo_de_vida < b.ciclo_de_vida; });
     }
 
     return nullptr;
@@ -232,26 +248,29 @@ int obterProximoProcesso()
 int iniciando_SO(pthread_t &thread_SO)
 {
 
-    if(op  == 4){
+    if (op == 4)
+    {
         auto inicio = high_resolution_clock::now();
         gerar_lista_similiaridade();
         auto fim = high_resolution_clock::now();
         auto duracao = duration_cast<nanoseconds>(fim - inicio);
-        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n" << endl;
-
+        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n"
+             << endl;
     }
-    else{
+    else
+    {
         gerarLista();
     }
 
-    //cout << "-------------1-----------" << endl;
-    for (const auto& so : listaCircular_SO_2) {
+    // cout << "-------------1-----------" << endl;
+    for (const auto &so : listaCircular_SO_2)
+    {
         cout << "ID do Processo: " << so.id_processo << endl;
         cout << "Ciclo de Vida: " << so.ciclo_de_vida << endl;
         cout << "Prioridade: " << so.prioridade << endl;
         cout << "-------------------------" << endl;
     }
-    //cout << "------------@------------" << endl;
+    // cout << "------------@------------" << endl;
 
     int ret = 0;
 
