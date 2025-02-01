@@ -31,13 +31,16 @@ void add_ListaCircular(PCB processo)
 {
     lock_guard<mutex> lock(mutexListaCircular);
     // Verifica se o processo já está na lista
-    auto it = find(listaCircular_SO.begin(), listaCircular_SO.end(), processo.id);
-    if (it == listaCircular_SO.end())
+    auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
+                      [&processo](const SO &so)
+                      { return so.id_processo == processo.id; });
+    if (it == listaCircular_SO_2.end())
     {
         SO aux_job;
         aux_job.id_processo = processo.id;
         aux_job.ciclo_de_vida = processo.ciclo_de_vida;
         aux_job.prioridade = processo.prioridade;
+        aux_job.conjunto_chaves = processo.conjunto_chaves;
         listaCircular_SO_2.push_back(aux_job); // Adiciona apenas se não existir
         // estadosProcessos[idProcesso] = "PRONTO";
     }
@@ -47,16 +50,130 @@ void add_ListaCircular(PCB processo)
     }
 }
 
+void add_ListaCircular_adptado(SO processo)
+{
+    lock_guard<mutex> lock(mutexListaCircular);
+    // Verifica se o processo já está na lista
+    auto it = find_if(listaCircular_SO_2.begin(), listaCircular_SO_2.end(),
+                      [&processo](const SO &so)
+                      { return so.id_processo == processo.id_processo; });
+
+    if (it == listaCircular_SO_2.end())
+    {
+        listaCircular_SO_2.push_back(processo); // Adiciona apenas se não existir
+        // estadosProcessos[idProcesso] = "PRONTO";
+    }
+    else
+    {
+        cout << "Processo já está na fila: " << processo.id_processo << endl;
+    }
+}
+
 void gerarLista()
 {
-
     for (const Page &pag : memoryPages)
     {
         add_ListaCircular(pag.pcb);
     }
 }
 
+double jaccardIndex(const vector<string> &vec1, const vector<string> &vec2)
+{
+    // Transformando os vetores em conjuntos para facilitar o cálculo
+    unordered_set<string> set1(vec1.begin(), vec1.end());
+    unordered_set<string> set2(vec2.begin(), vec2.end());
+
+    int intersection = 0;
+    for (const auto &chave : set1)
+    {
+        if (set2.find(chave) != set2.end())
+        {
+            intersection++;
+        }
+    }
+    int unionSet = set1.size() + set2.size() - intersection;
+    return static_cast<double>(intersection) / unionSet;
+}
+
+vector<map<int, SO>> aplicarLSH(const vector<PCB> &jobs, double threshold)
+{
+    vector<map<int, SO>> buckets; // Para armazenar os grupos de jobs
+
+    // Aplicando uma função hash simples
+    for (const auto &job : jobs)
+    {
+        bool added = false;
+
+        SO aux_job;
+        aux_job.id_processo = job.id;
+        aux_job.ciclo_de_vida = job.ciclo_de_vida;
+        aux_job.prioridade = job.prioridade;
+        aux_job.conjunto_chaves = job.conjunto_chaves;
+
+        // Verificando em quais buckets este job deve ser inserido
+        for (auto &bucket : buckets)
+        {
+            for (const auto &existingJobPair : bucket)
+            {
+                const SO &existingJob = existingJobPair.second; // Acesso ao valor do map
+                if (jaccardIndex(job.conjunto_chaves, existingJob.conjunto_chaves) >= threshold)
+                {
+                    bucket[aux_job.id_processo] = aux_job; // Adiciona o job ao bucket com alta interseção
+                    added = true;
+                    break;
+                }
+            }
+            if (added)
+                break;
+        }
+
+        // Se o job não foi adicionado a nenhum bucket, criamos um novo bucket
+        if (!added)
+        {
+            map<int, SO> newBucket;
+            newBucket[aux_job.id_processo] = aux_job;
+            buckets.push_back(newBucket);
+        }
+    }
+
+    return buckets;
+}
+
+void gerar_lista_similiaridade()
+{
+    vector<PCB> listaJob;
+    double threshold = 0.3;
+
+    for (const Page &pag : memoryPages)
+    {
+        listaJob.push_back(pag.pcb);
+    }
+
+    auto grupos = aplicarLSH(listaJob, threshold);
+
+    for (const auto &grupo : grupos)
+    {
+
+        for (const auto &jobPair : grupo)
+        {
+            const SO &job = jobPair.second; // Acesso ao valor do map
+            add_ListaCircular_adptado(job);
+        }
+    }
+}
+
 void *FCFS(void *arg)
+{
+    (void)arg;
+
+    while (!listaCircular_SO_2.empty())
+    {
+    }
+
+    return nullptr;
+}
+
+void *Similiaridade(void *arg)
 {
     (void)arg;
 
@@ -125,17 +242,33 @@ int obterProximoProcesso()
 
 int iniciando_SO(pthread_t &thread_SO)
 {
-    gerarLista();
-    using namespace std::chrono;
 
+    if (op == 4)
+    {
+        auto inicio = high_resolution_clock::now();
+        gerar_lista_similiaridade();
+        auto fim = high_resolution_clock::now();
+        auto duracao = duration_cast<nanoseconds>(fim - inicio);
+        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n"
+             << endl;
+    }
+    else
+    {
+        gerarLista();
+    }
+
+    // cout << "-------------1-----------" << endl;
     // for (const auto &so : listaCircular_SO_2)
     // {
-    //     std::cout << "ID: " << so.id_processo
-    //               << ", Ciclo de Vida: " << so.ciclo_de_vida
-    //               << ", Prioridade: " << so.prioridade << std::endl;
+    //     cout << "ID do Processo: " << so.id_processo << endl;
+    //     cout << "Ciclo de Vida: " << so.ciclo_de_vida << endl;
+    //     cout << "Prioridade: " << so.prioridade << endl;
+    //     cout << "-------------------------" << endl;
     // }
+    // cout << "------------@------------" << endl;
 
     int ret = 0;
+
     switch (op)
     {
     case 1:
@@ -147,6 +280,9 @@ int iniciando_SO(pthread_t &thread_SO)
         break;
     case 3:
         ret = pthread_create(&thread_SO, nullptr, Prioridade, nullptr);
+        break;
+    case 4:
+        ret = pthread_create(&thread_SO, nullptr, Similiaridade, nullptr);
         break;
     default:
         return 1;

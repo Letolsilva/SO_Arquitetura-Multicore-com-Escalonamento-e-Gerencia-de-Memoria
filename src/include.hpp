@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
 #include <sstream>
 #include <unistd.h>
 #include <unordered_map>
@@ -16,11 +17,16 @@
 #include <sched.h>
 #include <random>
 #include <algorithm>
+#include <optional>
+#include <set>
+#include <unordered_set>
 
 #define NUM_PERIFERICOS 5
+#define TAM_CACHE 6
 #define NUM_CORE 2
 
 using namespace std;
+using namespace std::chrono;
 namespace fs = filesystem;
 
 enum EstadoProcesso
@@ -30,6 +36,7 @@ enum EstadoProcesso
     EXECUTANDO,
     TERMINADO
 };
+
 
 extern int PC;
 extern int CLOCK;
@@ -56,6 +63,7 @@ struct PCB
     int ciclo_de_vida_inicial;
     int pc;
     vector<int> registradores; // Banco de registradores
+    vector<string> conjunto_chaves;
     EstadoProcesso estado;     // Estado atual do processo
     string nomeArquivo;        // Nome do arquivo associado
     vector<string> instrucoes; // Instruções do processo
@@ -75,10 +83,12 @@ struct SO
     int id_processo;
     int ciclo_de_vida;
     int prioridade;
+    vector<string> conjunto_chaves;
 };
 
 //----Memoria
 extern vector<Page> memoryPages;
+extern unordered_map<string,int> memoriaCache;
 extern int currentPageIndex;
 extern vector<PCB> memoria; //?
 extern mutex mutexProcessos;

@@ -14,17 +14,28 @@ vector<mutex> mutexCores(NUM_CORE);
 
 int main()
 {
-
-    using namespace std::chrono;
-
     cout << "\n\n\t ----------{Escolha a Politica de Escalanomento}---------- " << endl;
     cout << "\n\t\t [1] = FCFS.";
     cout << "\n\t\t [2] = Shortest Remaining Job First";
     cout << "\n\t\t [3] = Prioridade";
+    cout << "\n\t\t [4] = Similiaridade";
     cout << "\n\t\t [>] = ";
-    cin >> op;
-    cout << "\n\n\t --------------------------------------------------------- " << endl;
 
+    while (true)
+    {
+        cin >> op;
+        if (cin.fail() || op < 0 || op > 4)
+        {
+            cout << "\n\t\t [!] = Entrada inválida! Tente novamente.\n\t\t [>] = ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        else
+        {
+            break;
+        }
+    }
+    cout << "\n\n\t --------------------------------------------------------- " << endl;
 
     auto inicio = high_resolution_clock::now();
     pthread_t monitor = {};
