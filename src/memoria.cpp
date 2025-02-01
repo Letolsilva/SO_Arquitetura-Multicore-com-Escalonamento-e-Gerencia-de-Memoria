@@ -146,19 +146,22 @@ void carregarProcessosNaMemoria()
                         pcb.ciclo_de_vida += tempoAdicional;
                     }
                 }
-                else if(op == 4){
+                else if (op == 4)
+                {
                     stringstream ss(linha);
                     string chave = "";
                     ss >> instrucao >> info1 >> info2 >> info3;
-                    
-                    if(instrucao == "="){
+
+                    if (instrucao == "=")
+                    {
                         vetor_registador_auxiliar[info1] = info2;
                     }
-                    else{
-                        chave =  gerardor_Chave(instrucao[0], vetor_registador_auxiliar[info2], vetor_registador_auxiliar[info3]);
-                        cout << "Chave gerada na memoria: " << chave << endl;
+                    else
+                    {
+                        chave = gerardor_Chave(instrucao[0], vetor_registador_auxiliar[info2], vetor_registador_auxiliar[info3]);
+                        // cout << "Chave gerada na memoria: " << chave << endl;
                         pcb.conjunto_chaves.push_back(chave);
-                    }     
+                    }
                 }
                 else
                 {
@@ -167,14 +170,13 @@ void carregarProcessosNaMemoria()
                 pcb.ciclo_de_vida_inicial = pcb.ciclo_de_vida;
             }
 
-            // Imprime o vetor vetor_registador_auxiliar
-            cout << "Vetor de registradores auxiliar: ";
-            for (int i = 0; i < 8; ++i)
-            {
-                cout << std::setw(2) << vetor_registador_auxiliar[i] << " ";
-            }
-            cout << endl;
-
+            // // Imprime o vetor vetor_registador_auxiliar
+            // cout << "Vetor de registradores auxiliar: ";
+            // for (int i = 0; i < 8; ++i)
+            // {
+            //     cout << std::setw(2) << vetor_registador_auxiliar[i] << " ";
+            // }
+            // cout << endl;
 
             arquivo.close();
 

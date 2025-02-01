@@ -151,19 +151,14 @@ void gerar_lista_similiaridade()
 
     auto grupos = aplicarLSH(listaJob, threshold);
 
-    int contador = 1;
-    cout << "\n-------------1-----------" << endl;
     for (const auto &grupo : grupos)
     {
-        cout << "Grupo " << contador++ << ": ";
+
         for (const auto &jobPair : grupo)
         {
             const SO &job = jobPair.second; // Acesso ao valor do map
             add_ListaCircular_adptado(job);
-            cout << "\n\t Job ID: " << job.id_processo << endl;
         }
-        cout << endl;
-        cout << "-------------------------" << endl;
     }
 }
 
@@ -263,13 +258,13 @@ int iniciando_SO(pthread_t &thread_SO)
     }
 
     // cout << "-------------1-----------" << endl;
-    for (const auto &so : listaCircular_SO_2)
-    {
-        cout << "ID do Processo: " << so.id_processo << endl;
-        cout << "Ciclo de Vida: " << so.ciclo_de_vida << endl;
-        cout << "Prioridade: " << so.prioridade << endl;
-        cout << "-------------------------" << endl;
-    }
+    // for (const auto &so : listaCircular_SO_2)
+    // {
+    //     cout << "ID do Processo: " << so.id_processo << endl;
+    //     cout << "Ciclo de Vida: " << so.ciclo_de_vida << endl;
+    //     cout << "Prioridade: " << so.prioridade << endl;
+    //     cout << "-------------------------" << endl;
+    // }
     // cout << "------------@------------" << endl;
 
     int ret = 0;
