@@ -125,7 +125,7 @@ void carregarProcessosNaMemoria()
             {
                 pcb.instrucoes.push_back(linha);
 
-                if (op == 2)
+                if (op == 2 || op == 5)
                 {
                     stringstream ss(linha);
                     ss >> instrucao >> info1 >> info2 >> info3;

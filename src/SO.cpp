@@ -4,9 +4,11 @@
 
 vector<int> listaCircular_SO;
 vector<SO> listaCircular_SO_2;
-vector<string> enderecoVirtual;
+vector<adressVirtual> enderecoVirtual;
 size_t indiceAtual = 0;
+size_t indiceAtual_virtual = 0;
 mutex mutexListaCircular;
+mutex mutexEnderecoVirtual;
 
 void remover_ListaCircular(int id_processo)
 {
@@ -43,6 +45,27 @@ void add_ListaCircular(PCB processo)
         aux_job.prioridade = processo.prioridade;
         aux_job.conjunto_chaves = processo.conjunto_chaves;
         listaCircular_SO_2.push_back(aux_job); // Adiciona apenas se não existir
+        // estadosProcessos[idProcesso] = "PRONTO";
+    }
+    else
+    {
+        cout << "Processo já está na fila: " << processo.id << endl;
+    }
+}
+
+void add_vetor_endereco_virtual(PCB processo)
+{
+    lock_guard<mutex> lock(mutexEnderecoVirtual);
+    // Verifica se o processo já está na lista
+    auto it = find_if(enderecoVirtual.begin(), enderecoVirtual.end(),
+                      [&processo](const adressVirtual &so)
+                      { return so.endereco == intParaBinario(indiceAtual) ;});
+    if (it == enderecoVirtual.end())
+    {
+
+        adressVirtual aux_virtual;
+        aux_virtual.ciclo_de_vida = processo.ciclo_de_vida;
+        enderecoVirtual.push_back(aux_virtual); // Adiciona apenas se não existir
         // estadosProcessos[idProcesso] = "PRONTO";
     }
     else
@@ -203,29 +226,36 @@ void *MMU(void *arg)
 {
     (void)arg;
 
-    gerarLista();
-    string binario;
-
     {
+        string binario;
         lock_guard<mutex> lock(mutexListaCircular);
-        for(int x=0; x<(int)listaCircular_SO_2.size(); x++){
-            binario = intParaBinario(x);
-            enderecoVirtual.push_back(binario);
-            cout  << '\n' << binario << endl;
+        int cont=0;
+        for (const auto &so : listaCircular_SO_2)
+        {
+            binario = intParaBinario(cont);
+            adressVirtual aux;
+            aux.endereco = binario;
+            aux.ciclo_de_vida = so.ciclo_de_vida;
+            enderecoVirtual.push_back(aux);
+            cont++;
         }
     }
-    
-    while (!listaCircular_SO_2.empty())
+
+    // int contA=0;
+    while (!enderecoVirtual.empty())
     {
-        lock_guard<mutex> lock(mutexListaCircular);
-        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b)
-            {
-                if(a.ciclo_de_vida < b.ciclo_de_vida){
-                    int endereciFisico_A = binarioParaInt(enderecoVirtual[a.id_processo]);
-                    int endereciFisico_B = binarioParaInt(enderecoVirtual[b.id_processo]);
-                    return enderecoVirtual[endereciFisico_A] < enderecoVirtual[endereciFisico_B];
-                }
-            });
+        lock_guard<mutex> lock(mutexEnderecoVirtual);
+        sort(enderecoVirtual.begin(), enderecoVirtual.end(), [](const adressVirtual &a, const adressVirtual &b)
+            { return a.ciclo_de_vida < b.ciclo_de_vida; });   
+
+        // if(contA==0){
+        //     cout << "Depois do primeiro laço (conteúdo de enderecoVirtual):" << std::endl;
+        //     for (const auto &end : enderecoVirtual)
+        //     {
+        //         cout << "Endereco: " << end.endereco << ", Ciclo de Vida: " << end.ciclo_de_vida << std::endl;
+        //     }
+        //     contA++;
+        // }   
     }
 
     return nullptr;
@@ -243,6 +273,34 @@ void *Prioridade(void *arg)
     }
 
     return nullptr;
+}
+
+int obterProximoProcesso_pelo_enderecoVirtual()
+{
+    lock_guard<mutex> lock(mutexEnderecoVirtual);
+    if (enderecoVirtual.empty())
+    {
+        return -1;
+    }
+
+    // Pega o próximo processo da lista circular
+    int idProcesso = binarioParaInt(enderecoVirtual[indiceAtual_virtual].endereco);
+    //cout << "\n\t Pegando o : " << enderecoVirtual[indiceAtual_virtual].endereco  << "de a id:" << idProcesso << endl;
+
+    // Remove o processo atual da lista
+    enderecoVirtual.erase(enderecoVirtual.begin() + indiceAtual_virtual);
+
+    // Ajusta o índice atual
+    if (enderecoVirtual.empty())
+    {
+        indiceAtual_virtual = 0; // Reseta o índice se a lista estiver vazia
+    }
+    else
+    {
+        indiceAtual_virtual = indiceAtual_virtual % enderecoVirtual.size(); // Garante que o índice esteja válido
+    }
+
+    return idProcesso;
 }
 
 int obterProximoProcesso()
