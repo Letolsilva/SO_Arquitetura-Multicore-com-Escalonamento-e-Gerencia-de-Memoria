@@ -1,6 +1,7 @@
 #ifndef SO_HPP
 #define SO_HPP
 #include "include.hpp"
+#include "mmu.hpp"
 
 int iniciando_SO(pthread_t &thread_SO);
 int obterProximoProcesso();

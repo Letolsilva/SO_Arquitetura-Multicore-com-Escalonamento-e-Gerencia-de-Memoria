@@ -19,12 +19,13 @@ int main()
     cout << "\n\t\t [2] = Shortest Remaining Job First";
     cout << "\n\t\t [3] = Prioridade";
     cout << "\n\t\t [4] = Similiaridade";
+    cout << "\n\t\t [5] = MMU";
     cout << "\n\t\t [>] = ";
 
     while (true)
     {
         cin >> op;
-        if (cin.fail() || op < 0 || op > 4)
+        if (cin.fail() || op < 0 || op > 5)
         {
             cout << "\n\t\t [!] = Entrada inválida! Tente novamente.\n\t\t [>] = ";
             cin.clear();

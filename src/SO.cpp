@@ -4,6 +4,7 @@
 
 vector<int> listaCircular_SO;
 vector<SO> listaCircular_SO_2;
+vector<string> enderecoVirtual;
 size_t indiceAtual = 0;
 mutex mutexListaCircular;
 
@@ -198,6 +199,38 @@ void *First_Remain_Job_First(void *arg)
     return nullptr;
 }
 
+void *MMU(void *arg)
+{
+    (void)arg;
+
+    gerarLista();
+    string binario;
+
+    {
+        lock_guard<mutex> lock(mutexListaCircular);
+        for(int x=0; x<(int)listaCircular_SO_2.size(); x++){
+            binario = intParaBinario(x);
+            enderecoVirtual.push_back(binario);
+            cout  << '\n' << binario << endl;
+        }
+    }
+    
+    while (!listaCircular_SO_2.empty())
+    {
+        lock_guard<mutex> lock(mutexListaCircular);
+        sort(listaCircular_SO_2.begin(), listaCircular_SO_2.end(), [](const SO &a, const SO &b)
+            {
+                if(a.ciclo_de_vida < b.ciclo_de_vida){
+                    int endereciFisico_A = binarioParaInt(enderecoVirtual[a.id_processo]);
+                    int endereciFisico_B = binarioParaInt(enderecoVirtual[b.id_processo]);
+                    return enderecoVirtual[endereciFisico_A] < enderecoVirtual[endereciFisico_B];
+                }
+            });
+    }
+
+    return nullptr;
+}
+
 void *Prioridade(void *arg)
 {
     (void)arg;
@@ -249,8 +282,7 @@ int iniciando_SO(pthread_t &thread_SO)
         gerar_lista_similiaridade();
         auto fim = high_resolution_clock::now();
         auto duracao = duration_cast<nanoseconds>(fim - inicio);
-        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n"
-             << endl;
+        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n"<< endl;
     }
     else
     {
@@ -284,6 +316,9 @@ int iniciando_SO(pthread_t &thread_SO)
     case 4:
         ret = pthread_create(&thread_SO, nullptr, Similiaridade, nullptr);
         break;
+    case 5:
+        ret = pthread_create(&thread_SO, nullptr, MMU, nullptr);
+        break;
     default:
         return 1;
         break;
@@ -312,7 +347,6 @@ void imprimirListaCircular()
     lock_guard<mutex> lock(mutexListaCircular);
     if (listaCircular_SO_2.empty())
     {
-
         return;
     }
 

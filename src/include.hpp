@@ -101,6 +101,7 @@ extern vector<SO> listaCircular_SO_2;
 extern size_t indiceAtual;
 extern mutex mutexListaCircular;
 extern unordered_map<int, string> estadosProcessos;
+extern vector<string> enderecoVirtual;
 
 //----Hash para tempos de execução das operações (para SJF)
 extern unordered_map<string, int> temposExecucao;
