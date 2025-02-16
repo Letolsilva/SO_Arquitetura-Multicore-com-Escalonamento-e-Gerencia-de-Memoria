@@ -59,7 +59,7 @@ void add_vetor_endereco_virtual(PCB processo)
     // Verifica se o processo já está na lista
     auto it = find_if(enderecoVirtual.begin(), enderecoVirtual.end(),
                       [&processo](const adressVirtual &so)
-                      { return so.endereco == intParaBinario(indiceAtual) ;});
+                      { return so.endereco == intParaBinario(indiceAtual); });
     if (it == enderecoVirtual.end())
     {
 
@@ -229,7 +229,7 @@ void *MMU(void *arg)
     {
         string binario;
         lock_guard<mutex> lock(mutexListaCircular);
-        int cont=0;
+        int cont = 0;
         for (const auto &so : listaCircular_SO_2)
         {
             binario = intParaBinario(cont);
@@ -246,7 +246,7 @@ void *MMU(void *arg)
     {
         lock_guard<mutex> lock(mutexEnderecoVirtual);
         sort(enderecoVirtual.begin(), enderecoVirtual.end(), [](const adressVirtual &a, const adressVirtual &b)
-            { return a.ciclo_de_vida < b.ciclo_de_vida; });   
+             { return a.ciclo_de_vida < b.ciclo_de_vida; });
 
         // if(contA==0){
         //     cout << "Depois do primeiro laço (conteúdo de enderecoVirtual):" << std::endl;
@@ -255,7 +255,7 @@ void *MMU(void *arg)
         //         cout << "Endereco: " << end.endereco << ", Ciclo de Vida: " << end.ciclo_de_vida << std::endl;
         //     }
         //     contA++;
-        // }   
+        // }
     }
 
     return nullptr;
@@ -285,7 +285,7 @@ int obterProximoProcesso_pelo_enderecoVirtual()
 
     // Pega o próximo processo da lista circular
     int idProcesso = binarioParaInt(enderecoVirtual[indiceAtual_virtual].endereco);
-    //cout << "\n\t Pegando o : " << enderecoVirtual[indiceAtual_virtual].endereco  << "de a id:" << idProcesso << endl;
+    // cout << "\n\t Pegando o : " << enderecoVirtual[indiceAtual_virtual].endereco  << "de a id:" << idProcesso << endl;
 
     // Remove o processo atual da lista
     enderecoVirtual.erase(enderecoVirtual.begin() + indiceAtual_virtual);
@@ -340,7 +340,8 @@ int iniciando_SO(pthread_t &thread_SO)
         gerar_lista_similiaridade();
         auto fim = high_resolution_clock::now();
         auto duracao = duration_cast<nanoseconds>(fim - inicio);
-        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n"<< endl;
+        cout << "\n\n\t [!] - Tempo para calcular similiaridade: " << duracao.count() << " nanosegundos.\n"
+             << endl;
     }
     else
     {
@@ -408,16 +409,7 @@ void imprimirListaCircular()
         return;
     }
 
-    cout << "Lista circular atual:" << endl;
     size_t index = 0;
-    for (const SO &pag : listaCircular_SO_2)
-    {
-        cout << "Índice " << index << ": Processo ID " << pag.id_processo;
-        if (index == indiceAtual)
-        {
-            cout << " <- Índice atual";
-        }
-        cout << endl;
-        index++;
-    }
+
+    index++;
 }
