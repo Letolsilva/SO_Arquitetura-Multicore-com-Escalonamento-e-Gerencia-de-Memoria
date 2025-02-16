@@ -1,4 +1,4 @@
-<h1 align="center" font-size="200em"><b>Simulador da Arquitetura Multicore de Von Neumann com Suporte a Preempção, Escalonador e cache</b></h1>
+<h1 align="center" font-size="200em"><b>Simulador da Arquitetura Multicore de Von Neumann com Suporte a Preempção, Escalonador, cache e gerenciamento de memória</b></h1>
 
 <div align = "center" >
 <!-- imagem -->
@@ -22,8 +22,7 @@ Confira abaixo o diagrama que ilustra a abstração da arquitetura multicore com
 ## Escalonador
 Foram implementados três escalonadores: First Come, First Served (FCFS), Shortest Job Next (SJRN) e Escalonamento por Prioridade. Lembre-se de escolher o escalonador que deseja executar no terminal, utilizando os números 1, 2 ou 3.
 
-![image](https://github.com/user-attachments/assets/9097ffdc-ed0c-4022-b909-ecf87accf624)
-
+![alt text](image.png)
    
 ## Arquivos de entrada e saída
 

@@ -86,6 +86,12 @@ struct SO
     vector<string> conjunto_chaves;
 };
 
+struct adressVirtual
+{
+    string endereco;
+    int ciclo_de_vida;
+};
+
 //----Memoria
 extern vector<Page> memoryPages;
 extern unordered_map<string,int> memoriaCache;
@@ -99,8 +105,12 @@ extern mutex output;
 extern vector<int> listaCircular_SO;
 extern vector<SO> listaCircular_SO_2;
 extern size_t indiceAtual;
+extern size_t indiceAtual_virtual;
 extern mutex mutexListaCircular;
 extern unordered_map<int, string> estadosProcessos;
+extern vector<adressVirtual>enderecoVirtual;
+extern mutex mutexEnderecoVirtual;
+
 
 //----Hash para tempos de execução das operações (para SJF)
 extern unordered_map<string, int> temposExecucao;

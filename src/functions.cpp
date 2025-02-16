@@ -58,7 +58,15 @@ void *processarProcesso(void *arg)
 
     while (true)
     {
-        int idProcesso = obterProximoProcesso();
+        int idProcesso = -1;
+        if(op  != 5){
+            idProcesso = obterProximoProcesso();
+        }
+        else{
+            idProcesso = obterProximoProcesso_pelo_enderecoVirtual() +1;
+            //cout << "\n\t id Processo: " << idProcesso << endl;
+        }
+        
         int timestamp_inicial = 0;
 
         if (idProcesso == -1)
@@ -107,7 +115,6 @@ void *processarProcesso(void *arg)
             mt19937 gen(rd());
             uniform_int_distribution<> dist(20, 50);
             processoAtual.quantum = dist(gen);
-            // processoAtual.quantum = 5;
             if (processoAtual.prioridade != 0)
             {
                 processoAtual.prioridade--;
@@ -117,7 +124,13 @@ void *processarProcesso(void *arg)
             processoAtual.estado = PRONTO;
             atualizarEstadoProcesso(processoAtual.id, "PRONTO");
             salvarNaMemoria(&processoAtual);
-            add_ListaCircular(processoAtual);
+            
+            if(op!=5){
+                add_ListaCircular(processoAtual);
+
+            }else{
+                add_vetor_endereco_virtual(processoAtual);
+            }
         }
 
         int quantumInicial = processoAtual.quantum;
@@ -125,6 +138,9 @@ void *processarProcesso(void *arg)
         stringstream ss;
         ss << "Thread_CPU" << coreIndex << " processando processo ID=" << processoAtual.id << endl;
         ss << "Estado: " << obterEstadoProcesso(processoAtual) << endl;
+
+        // cout << "Thread_CPU" << coreIndex << " processando processo ID=" << processoAtual.id << endl;
+        // cout << "Estado: " << obterEstadoProcesso(processoAtual) << endl;
 
         // Executar as instruções do processo
         processarInstrucoes(processoAtual);
@@ -134,7 +150,7 @@ void *processarProcesso(void *arg)
 
         if (processoAtual.estado == TERMINADO)
         {
-
+            
             lock_guard<mutex> lock(mutexProcessos);
             for (auto it = memoryPages.begin(); it != memoryPages.end(); ++it)
             {
@@ -234,7 +250,16 @@ void *monitorQuantum(void *args)
             salvarNoArquivo(ss.str());
         }
         processoAtual->quantum = 0;
-        add_ListaCircular(*processoAtual);
+        //adicionar aqui para a fila de endereco virtual -------------------------------------------
+       // add_ListaCircular(*processoAtual);
+
+        if(op!=5){
+            add_ListaCircular(*processoAtual);
+
+        }else{
+            add_vetor_endereco_virtual(*processoAtual);
+        }
+
         atualizarEstadoProcesso(processoAtual->id, "BLOQUEADO");
         salvarNaMemoria(processoAtual);
         pthread_exit(nullptr);
@@ -278,7 +303,14 @@ void processarInstrucoes(PCB &processoAtual)
         processoAtual.estado = BLOQUEADO;
         atualizarEstadoProcesso(processoAtual.id, "BLOQUEADO");
         usleep(1000000);
-        add_ListaCircular(processoAtual);
+        //add_ListaCircular(processoAtual);
+
+        if(op!=5){
+            add_ListaCircular(processoAtual);
+
+        }else{
+            add_vetor_endereco_virtual(processoAtual);
+        }
     }
 }
 
